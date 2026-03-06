@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "291287014472",
+    "project_id": "themdhouse-7bc5e",
+    "storage_bucket": "themdhouse-7bc5e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291287014472:android:65375b294754dcf48e4c7d",
+        "android_client_info": {
+          "package_name": "com.mdhouseapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "291287014472-g3hgd5pbm1il7nn9im3b0nr9adkjt028.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mdhouseapp",
+            "certificate_hash": "2e6eec89773da3763d17fa0dadbe444ca1317c77"
+          }
+        },
+        {
+          "client_id": "291287014472-fo1pnul9gj21qqm0b9hqfqrnitd8d604.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz0frSBfVcWaVdN-X713ZwOr9tnjvPiSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "291287014472-fo1pnul9gj21qqm0b9hqfqrnitd8d604.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "291287014472-f2sl1cu3k42cfi1ua2c2l5a69qijem7o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mdhouse.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

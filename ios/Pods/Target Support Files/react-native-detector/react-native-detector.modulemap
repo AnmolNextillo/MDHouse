@@ -1,0 +1,6 @@
+framework module react_native_detector {
+  umbrella header "react-native-detector-umbrella.h"
+
+  export *
+  module * { export * }
+}

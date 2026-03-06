@@ -1,0 +1,22 @@
+export const appColors = {
+    primaryColor: '#D2042D',
+    primaryColorLight: '#E6294F',
+    // offWhite: '#fafafa',
+    white: '#FFFFFF',
+    black: '#000000',
+    bgBlack: '#1D1C1B',
+    grey: '#76797c',
+    offWhite: '#F5F5F5',
+    red: '#FF0000',
+    yellow: '#ffcc66',
+    green: '#00e600',
+    transparent:"#808080",
+    lightGray:"#C1BEB9",
+    blue:"#0000FF",
+    brown:"#9F876E",
+    lightBlue:"#5572C2",
+    orange:"#E29F51",
+    darkBrown:"#711905",
+    greenLight:"#28C495",
+  };
+  
