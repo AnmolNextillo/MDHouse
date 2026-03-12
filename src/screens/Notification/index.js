@@ -39,15 +39,42 @@ const Notification = ({ navigation }) => {
   }, [responseNotifications]);
 
   const renderNotification = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={()=>onItemClick(item.type)}>
 
       <View style={styles.textContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.message}>{item.message}</Text>
         <Text style={styles.date}>{moment(item.createdAt).format("DD MMM, YYYY")}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
+
+  const onItemClick = (type) => {
+    // Handle notification click, e.g., navigate to details or mark as read
+    switch (type) {
+      case 1:
+        navigation.navigate("Home");
+        break;
+      case 3:
+        navigation.navigate("Gallery");
+        break;
+      case 4:
+        navigation.navigate("ResultScreen");
+        break;
+      case 5:
+        navigation.navigate("Attendance");
+        break;
+      case 6:
+        navigation.navigate("Chat");
+        break;
+      case 7:
+         navigation.navigate("DocumentUpload", { from: 3 });
+        break;
+      default:
+        // Handle other types or do nothing
+        break;
+    }
+  };
 
   return (
     <View style={styles.container}>

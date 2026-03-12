@@ -2,6 +2,7 @@ import { NewAppScreen } from "@react-native/new-app-screen";
 import {
   Alert,
   FlatList,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -41,8 +42,7 @@ import ForgotPassword from "./src/screens/ForgotPassword/index.js";
 import ImageViewer from "./src/screens/ImageViewer/index.js";
 import AlumniDetails from "./src/screens/AlumniDetails/index.js";
 import UploadAlumniDocuments from "./src/screens/UploadAlumniDocuments.js/index.js";
-
-// import RNDetector from 'react-native-detector';
+import useScreenSecurity from "./src/utils/useScreenSecurity.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -77,7 +77,7 @@ function NotificationCenter({ messages }) {
 }
 
 const App = () => {
-  const isDarkMode = useColorScheme() === "dark";
+  // const isDarkMode = useColorScheme() === "dark";
   const [initialRoute, setInitialRoute] = useState(null);
 
   const [fcmToken, setFcmToken] = useState(null);
@@ -98,6 +98,11 @@ const App = () => {
   //   } else {
   //     console.warn('RNDetector is not available. iOS screenshot detection will not work.');
   //   }
+  // }, []);
+
+  // useEffect(() => {
+    Platform.OS === "ios" &&
+     useScreenSecurity();
   // }, []);
 
   useEffect(() => {

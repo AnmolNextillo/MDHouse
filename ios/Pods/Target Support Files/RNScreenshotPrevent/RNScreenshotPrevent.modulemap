@@ -1,0 +1,6 @@
+framework module RNScreenshotPrevent {
+  umbrella header "RNScreenshotPrevent-umbrella.h"
+
+  export *
+  module * { export * }
+}
