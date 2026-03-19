@@ -85,7 +85,7 @@ const StudentDetials = ({ navigation, route }) => {
   /* ================= API CALL ================= */
 
   useEffect(() => {
-    dispatch(hitGetProfile());
+    dispatch(hitGetProfile({usertype:1}));
   }, []);
 
   const addStudentDetails = async () => {

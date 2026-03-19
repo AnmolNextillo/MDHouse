@@ -1,7 +1,7 @@
 // src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ApiBaseUrl, profile } from "../utils/constants";
+import { ApiBaseUrl, partnerProfile, profile } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const hitGetProfile = createAsyncThunk("hitGetProfile", async (payload) => {
@@ -13,11 +13,17 @@ export const hitGetProfile = createAsyncThunk("hitGetProfile", async (payload) =
         Authorization:token
       },
     };
-    const url = ApiBaseUrl + profile;
+    const url = ApiBaseUrl + (payload.usertype==1?profile:partnerProfile);
     console.log("URL ====> ",url,"  Payload ===>",payload)
-    const response = await axios.get(url,config);
+    if(payload.usertype==1){
+      const response = await axios.get(url,config);
     console.log("Response Get Profile===> ",response.data);
     return response.data;
+    } else {
+      const response = await axios.post(url,payload,config);
+      console.log("Response Get Profile===> ",response.data);
+      return response.data;
+    }
   } catch (error) {
     console.log("Error ===> ",error)
     throw error.response.data;

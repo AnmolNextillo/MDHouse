@@ -57,7 +57,7 @@ const ProfileOptios = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-      dispatch(hitGetProfile());
+      dispatch(hitGetProfile({usertype:1}));
     }
   }, [isFocused]);
 
@@ -94,7 +94,7 @@ const ProfileOptios = ({ navigation }) => {
     //     routes: [{ name: "Login" }],
     //   });
     // }, 50);
-    navigation.navigate("Login");
+    navigation.navigate("UserType");
   };
 
 

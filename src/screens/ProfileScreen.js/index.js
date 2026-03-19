@@ -44,7 +44,7 @@ const ProfileScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-      dispatch(hitGetProfile());
+      dispatch(hitGetProfile({usertype:1}));
     }
   }, [isFocused]);
 

@@ -30,6 +30,7 @@ import {
   appleAuth,
   AppleButton,
 } from "@invertase/react-native-apple-authentication";
+import BackIcon from "../../assets/svgs/BackIcon";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -222,6 +223,11 @@ const Login = ({ navigation }) => {
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>
+         <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon height={32} width={32} fill={appColors.white} />
+          </TouchableOpacity>
+        </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -386,6 +392,12 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: "center",
     marginTop: 40,
+  },
+   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   card: {
     backgroundColor: appColors.white,

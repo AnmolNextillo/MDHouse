@@ -24,6 +24,9 @@ import galleryReducer from './GallerySlice';
 import achivementsReducer from './AchievementsSlice';  
 import settingReducer from './SettingSlice';  
 import forgotReducer from './ForgotPasswordSlice';  
+import agentUpdateProfileReducer from './AgentUpdateProfileSlice';  
+import agentStudentListReducer from './AgentStudentListSlice';  
+import agentAddStudentReducer from './AgentAddStudentSlice';  
  
 const store = configureStore({ 
   reducer: {
@@ -52,6 +55,9 @@ const store = configureStore({
    achivementsReducer:achivementsReducer,
    settingReducer:settingReducer,
    forgotReducer:forgotReducer,
+   agentUpdateProfileReducer:agentUpdateProfileReducer,
+   agentStudentListReducer:agentStudentListReducer,
+   agentAddStudentReducer:agentAddStudentReducer,
   },
 });
 

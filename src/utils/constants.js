@@ -1,30 +1,37 @@
 
 import { PermissionsAndroid, Platform } from "react-native";
-export const ApiBaseUrl = "https://api-mdhouse.erptech.info/v1/student/"
+export const ApiBaseUrl = "https://api-mdhouse.erptech.info/v1/"
 
-export const signUp = "signUp";
-export const login  = "login";
-export const forgot  = "forgotPassword";
-export const updateProfile  = "updateProfile";
-export const profile  = "profile";
-export const deleteAccount  = "delete";
-export const versions  = "versions";
-export const notifications  = "notifications";
-export const getChat  = "getChat";
-export const sendMessage  = "sendMessage";
-export const dashboard  = "dashboard";
-export const getUniversityList  = "getUniversityList";
-export const googleLogin  = "googleLogin";
-export const getTelexRecord  = "getTelexRecord";
-export const getAgentList  = "getAgentList";
-export const applyForTelex  = "applyForTelex";
-export const getResult  = "getResult";
-export const issueReports  = "issueReports";
-export const settings  = "settings";
-export const getGallery  = "gallery";
-export const studentAchievements  = "studentAchievements";
-export const getAttendance  = "getAttendance";
-export const home  = "home";
+export const signUp = "student/signUp";
+export const login  = "student/login";
+export const forgot  = "student/forgotPassword";
+export const updateProfile  = "student/updateProfile";
+export const profile  = "student/profile";
+export const deleteAccount  = "student/delete";
+export const versions  = "student/versions";
+export const notifications  = "student/notifications";
+export const getChat  = "student/getChat";
+export const sendMessage  = "student/sendMessage";
+export const dashboard  = "student/dashboard";
+export const getUniversityList  = "student/getUniversityList";
+export const googleLogin  = "student/googleLogin";
+export const getTelexRecord  = "student/getTelexRecord";
+export const getAgentList  = "student/getAgentList";
+export const applyForTelex  = "student/applyForTelex";
+export const getResult  = "student/getResult";
+export const issueReports  = "student/issueReports";
+export const settings  = "student/settings";
+export const getGallery  = "student/getGallery";
+export const studentAchievements  = "student/studentAchievements";
+export const getAttendance  = "student/getAttendance";
+export const home  = "student/home";
+
+// Partner APIs
+export const partnerLogin  = "agent/login";
+export const partnerProfile  = "agent/getProfile";
+export const agentUpdateProfile  = "agent/updateProfile";
+export const agentStudentList  = "agent/studentList";
+export const agentAddStudent  = "agent/addStudent";
 
 
 export async function requestAllPermissions() {

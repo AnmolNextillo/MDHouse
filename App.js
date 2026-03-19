@@ -43,6 +43,11 @@ import ImageViewer from "./src/screens/ImageViewer/index.js";
 import AlumniDetails from "./src/screens/AlumniDetails/index.js";
 import UploadAlumniDocuments from "./src/screens/UploadAlumniDocuments.js/index.js";
 import useScreenSecurity from "./src/utils/useScreenSecurity.js";
+import UserTypeScreen from "./src/screens/UserTypeScreen/index.js";
+import PartnerLogin from "./src/screens/Partner/Login/PartnerLogin.js";
+import UpdateProfile from "./src/screens/Partner/UpdateProfile/index.js";
+import StudentList from "./src/screens/Partner/StudentList/index.js";
+import AddStudent from "./src/screens/Partner/AddStudent/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -123,19 +128,19 @@ const App = () => {
             if (step == 6) {
               setInitialRoute("BottomBar");
             } else {
-              setInitialRoute("Login");
+              setInitialRoute("UserType");
             }
           }
         } else {
           await AsyncStorage.removeItem("token");
           await AsyncStorage.removeItem("step");
-          setInitialRoute("Login");
+          setInitialRoute("UserType");
         }
       } catch (e) {
         console.error("Error reading token:", e);
         await AsyncStorage.removeItem("token");
         await AsyncStorage.removeItem("step");
-        setInitialRoute("Login"); // fallback
+        setInitialRoute("UserType"); // fallback
       }
     };
 
@@ -388,6 +393,11 @@ const App = () => {
                 component={UploadAlumniDocuments}
                 options={{ title: "UploadAlumniDocuments" }}
               />
+              <Stack.Screen name="UserType" component={UserTypeScreen} />
+              <Stack.Screen name="PartnerLogin" component={PartnerLogin} />
+              <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
+              <Stack.Screen name="StudentList" component={StudentList} />
+              <Stack.Screen name="AddStudent" component={AddStudent} />
             </Stack.Navigator>
           </View>
         </NavigationContainer>

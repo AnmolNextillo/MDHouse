@@ -15,6 +15,8 @@ import { hitDashboardApi } from "../redux/DashboardSlice.js";
 import ProfileOptios from "../screens/ProfileOptions/index.js";
 import GalleryIcon from "../assets/svgs/GalleryIcon.js";
 import GalleryScreen from "../screens/GalleryScreen/index.js";
+import ProfileOptions from "../screens/Partner/ProfileOptions/index.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import HomeIcon from '../assets/svg/HomeIcon';
 // import TasksIcon from '../assets/svg/TasksIcon';
@@ -29,17 +31,33 @@ const Tabs = () => {
 
   const responseDashboard = useSelector((state) => state.dashboardReducer.data);
   const dispatch = useDispatch();
-  const [dashboardData,setDashboard] = useState(null)
+  const [dashboardData, setDashboard] = useState(null)
+  const [userType, setUserType] = useState(null)
 
   useEffect(() => {
+    const setUserTypeFromStorage = async () => {
+      try {
+        const storedUserType = await AsyncStorage.getItem("userType");
+        console.log("Stored User Type:", storedUserType);
+        if (storedUserType) {
+            console.log("Stored User Type: 2", storedUserType);
+          setUserType(storedUserType);
+        }
+      } catch (error) {
+        console.error("Error fetching user type from storage:", error);
+      }
+    };
+
+    setUserTypeFromStorage();
+
     dispatch(hitDashboardApi());
   }, []);
 
-  useEffect(()=>{
-    if(responseDashboard!=null && responseDashboard.status == 1){
+  useEffect(() => {
+    if (responseDashboard != null && responseDashboard.status == 1) {
       setDashboard(responseDashboard.data)
     }
-  },[responseDashboard])
+  }, [responseDashboard])
 
   return (
     <Tab.Navigator
@@ -86,7 +104,7 @@ const Tabs = () => {
           ),
         }}
       />
-        <Tab.Screen
+      <Tab.Screen
         name="Chat"
         component={Chat}
         options={{
@@ -97,7 +115,7 @@ const Tabs = () => {
               width={24}
             />
           ),
-          tabBarBadge: dashboardData!=null && dashboardData.unreadMessagesCount>0?dashboardData.unreadMessagesCount:undefined,
+          tabBarBadge: dashboardData != null && dashboardData.unreadMessagesCount > 0 ? dashboardData.unreadMessagesCount : undefined,
           tabBarStyle: { display: "none" },
         }}
       />
@@ -112,12 +130,13 @@ const Tabs = () => {
               width={24}
             />
           ),
-          tabBarBadge: dashboardData!=null && dashboardData.unreadNotificationsCount>0?dashboardData.unreadNotificationsCount:undefined, // show a number badge
+          tabBarBadge: dashboardData != null && dashboardData.unreadNotificationsCount > 0 ? dashboardData.unreadNotificationsCount : undefined, // show a number badge
         }}
       />
-      <Tab.Screen
+     
+      {userType&&<Tab.Screen
         name="Profile"
-        component={ProfileOptios}
+        component={ userType=="partner"?ProfileOptions:ProfileOptios}
         options={{
           tabBarIcon: ({ focused }) => (
             <ProfileIconBtm
@@ -127,7 +146,7 @@ const Tabs = () => {
             />
           ),
         }}
-      />
+      />}
     </Tab.Navigator>
   );
 };
