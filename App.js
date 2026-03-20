@@ -106,8 +106,8 @@ const App = () => {
   // }, []);
 
   // useEffect(() => {
-    Platform.OS === "ios" &&
-     useScreenSecurity();
+    // Platform.OS === "ios" &&
+    //  useScreenSecurity();
   // }, []);
 
   useEffect(() => {
@@ -116,9 +116,14 @@ const App = () => {
       try {
         const token = await AsyncStorage.getItem("token");
         const step = await AsyncStorage.getItem("step");
-        const studentType = await AsyncStorage.getItem("user");
+        const studentType = await AsyncStorage.getItem("userType");
         console.log("Token found:", token, "Step ===> ", step, "Type ===> ", studentType);
         if (token) {
+          if (studentType == 3) {
+            const screen = "BottomBar";
+            setInitialRoute(screen);
+            return;
+          }
           if (studentType == 2) {
             const screen = "BottomBar";
             setInitialRoute(screen);

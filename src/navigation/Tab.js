@@ -17,6 +17,7 @@ import GalleryIcon from "../assets/svgs/GalleryIcon.js";
 import GalleryScreen from "../screens/GalleryScreen/index.js";
 import ProfileOptions from "../screens/Partner/ProfileOptions/index.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { hitCheckUser } from "../redux/CheckUserSlice.js";
 
 // import HomeIcon from '../assets/svg/HomeIcon';
 // import TasksIcon from '../assets/svg/TasksIcon';
@@ -30,34 +31,48 @@ const Tab = createBottomTabNavigator();
 const Tabs = () => {
 
   const responseDashboard = useSelector((state) => state.dashboardReducer.data);
+  const responseCheckUser = useSelector((state) => state.checkUserReducer.data);
   const dispatch = useDispatch();
   const [dashboardData, setDashboard] = useState(null)
   const [userType, setUserType] = useState(null)
 
   useEffect(() => {
-    const setUserTypeFromStorage = async () => {
-      try {
-        const storedUserType = await AsyncStorage.getItem("userType");
-        console.log("Stored User Type:", storedUserType);
-        if (storedUserType) {
-            console.log("Stored User Type: 2", storedUserType);
-          setUserType(storedUserType);
-        }
-      } catch (error) {
-        console.error("Error fetching user type from storage:", error);
-      }
-    };
+    // const setUserTypeFromStorage = async () => {
+    //   try {
+    //     const storedUserType = await AsyncStorage.getItem("userType");
+    //     console.log("Stored User Type:", storedUserType);
+    //     if (storedUserType) {
+    //         console.log("Stored User Type: 2", storedUserType);
+    //       setUserType(storedUserType);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching user type from storage:", error);
+    //   }
+    // };
 
-    setUserTypeFromStorage();
+    // setUserTypeFromStorage();
 
     dispatch(hitDashboardApi());
+    dispatch(hitCheckUser());
   }, []);
 
   useEffect(() => {
     if (responseDashboard != null && responseDashboard.status == 1) {
       setDashboard(responseDashboard.data)
     }
-  }, [responseDashboard])
+    if (responseCheckUser != null && responseCheckUser.status == 1) {
+      setUserType(responseCheckUser.data.userType);
+      saveUserTypeToStorage(responseCheckUser.data.userType);
+    }
+  }, [responseDashboard, responseCheckUser]);
+
+  const saveUserTypeToStorage = async (type) => {
+    try {
+      await AsyncStorage.setItem("userType", type.toString());
+    } catch (error) {
+      console.error("Error saving user type to storage:", error);
+    }
+  };
 
   return (
     <Tab.Navigator
@@ -136,7 +151,7 @@ const Tabs = () => {
      
       {userType&&<Tab.Screen
         name="Profile"
-        component={ userType=="partner"?ProfileOptions:ProfileOptios}
+        component={ userType==3?ProfileOptions:ProfileOptios}
         options={{
           tabBarIcon: ({ focused }) => (
             <ProfileIconBtm

@@ -30,8 +30,8 @@ import { getImage } from "../../../utils/getImages";
 import BackIcon from "../../../assets/svgs/BackIcon";
 
 const PartnerLogin = ({ navigation }) => {
-  const [email, setEmail] = useState("baljinder@nextillo.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
   const [userType, setUserType] = useState(""); // student | alumni

@@ -1,11 +1,12 @@
 // src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ApiBaseUrl, sendMessage } from "../utils/constants";
+import { ApiBaseUrl, sendMessage, sendMessageToAdmin } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const hitSendMessage = createAsyncThunk("hitSendMessage", async (payload) => {
   try {
+    const storedUserType = await AsyncStorage.getItem("userType");
     const token = await AsyncStorage.getItem('token');
     const config = {
       headers: {
@@ -13,7 +14,7 @@ export const hitSendMessage = createAsyncThunk("hitSendMessage", async (payload)
         Authorization:token
       },
     };
-    const url = ApiBaseUrl + sendMessage;
+    const url = ApiBaseUrl + (storedUserType == 3 ? sendMessageToAdmin : sendMessage);
     console.log("URL ====> ",url,"  Payload ===>",payload)
     const response = await axios.post(url,payload,config);
     console.log("Response Send Message===> ",response.data);

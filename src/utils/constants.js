@@ -25,6 +25,7 @@ export const getGallery  = "student/getGallery";
 export const studentAchievements  = "student/studentAchievements";
 export const getAttendance  = "student/getAttendance";
 export const home  = "student/home";
+export const checkUser  = "checkUser";
 
 // Partner APIs
 export const partnerLogin  = "agent/login";
@@ -32,6 +33,10 @@ export const partnerProfile  = "agent/getProfile";
 export const agentUpdateProfile  = "agent/updateProfile";
 export const agentStudentList  = "agent/studentList";
 export const agentAddStudent  = "agent/addStudent";
+export const agentNotifications  = "agent/notifications";
+export const agentDashboard  = "agent/dashboard";
+export const getChatWithAdmin  = "agent/getChatWithAdmin";
+export const sendMessageToAdmin  = "agent/sendMessageToAdmin";
 
 
 export async function requestAllPermissions() {

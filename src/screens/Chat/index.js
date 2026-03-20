@@ -13,7 +13,6 @@ import {
   Platform,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import LinearGradient from "react-native-linear-gradient";
 import BackIcon from "../../assets/svgs/BackIcon";
 import { appColors } from "../../utils/color";
 import { useDispatch, useSelector } from "react-redux";
@@ -46,33 +45,41 @@ const Chat = ({ navigation }) => {
     (state) => state.uploadFileReducer.data
   );
 
-  // ===== Chat Auto Refresh =====
+  /* ================= CHAT AUTO REFRESH ================= */
+
   useEffect(() => {
     if (!isFocused) return;
+
     dispatch(hitChatApi());
-    const interval = setInterval(() => dispatch(hitChatApi()), 10000);
+
+    const interval = setInterval(() => {
+      dispatch(hitChatApi());
+    }, 10000);
+
     return () => clearInterval(interval);
   }, [isFocused]);
 
   useEffect(() => {
-    if (responseChat != null && responseChat.status == 1) {
+    if (responseChat && responseChat.status === 1) {
       setIsProgress(false);
       setMessages(responseChat.data);
-      clearChat();
+      dispatch(clearChat());
     }
   }, [responseChat]);
 
   useEffect(() => {
-    if (messages != null && messages.length > 0) {
+    if (messages && messages.length > 0) {
       flatListRef.current?.scrollToEnd({ animated: true });
     }
   }, [messages]);
 
   useEffect(() => {
-    if (responseSendMessage != null && responseSendMessage.status == 1) {
+    if (responseSendMessage && responseSendMessage.status === 1) {
       dispatch(hitChatApi());
     }
   }, [responseSendMessage]);
+
+  /* ================= SEND ================= */
 
   const handleSend = () => {
     if (message.trim().length > 0) {
@@ -81,10 +88,10 @@ const Chat = ({ navigation }) => {
     }
   };
 
-  const onSend = (message, type) => {
+  const onSend = (msg, type) => {
     const payload = {
       message: {
-        message: message,
+        message: msg,
         senderType: 1,
         receiverType: 4,
         type: type, // 1 = text, 2 = file
@@ -93,7 +100,8 @@ const Chat = ({ navigation }) => {
     dispatch(hitSendMessage(payload));
   };
 
-  // ===== File and Image Handling =====
+  /* ================= FILE HANDLING ================= */
+
   const openModal = async () => {
     const hasPermission = await requestAllPermissions();
     if (hasPermission) {
@@ -101,100 +109,89 @@ const Chat = ({ navigation }) => {
     } else {
       Alert.alert(
         "Permission Denied",
-        "Please allow media and file permissions from settings."
+        "Please allow permissions from settings."
       );
     }
   };
 
   const openCamera = () => {
-  
-    ImageCropPicker.openCamera({
-      width: 300,
-      height: 400,
-      cropping: true,
-    }).then((image) => {
+    ImageCropPicker.openCamera({ width: 300, height: 400, cropping: true })
+      .then((image) => {
         setModalVisible(false);
-      const payload = {
-        uri: image.path,
-        fileName: image.filename,
-        type: image.mime,
-      };
-      dispatch(uploadFile(payload));
-    }).catch((err) => {
-      if (err.code === "E_NO_CAMERA_PERMISSION") {
-        showPermissionDeniedAlert();
-      }
-      console.log("❌ Camera error/cancel:", err.code);
-    });
+        dispatch(
+          uploadFile({
+            uri: image.path,
+            fileName: image.filename || "image.jpg",
+            type: image.mime,
+          })
+        );
+      })
+      .catch(() => {});
   };
 
   const openGallery = () => {
-  
-    ImageCropPicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
-    }).then((image) => {
+    ImageCropPicker.openPicker({ width: 300, height: 400, cropping: true })
+      .then((image) => {
         setModalVisible(false);
-      const payload = {
-        uri: image.path,
-        fileName: image.filename,
-        type: image.mime,
-      };
-      dispatch(uploadFile(payload));
-    }).catch((err) => {
-      if (err.code === "E_NO_LIBRARY_PERMISSION") {
-        showPermissionDeniedAlert();
-      }
-      console.log("❌ Gallery error/cancel:", err.code);
-    });
+        dispatch(
+          uploadFile({
+            uri: image.path,
+            fileName: image.filename || "image.jpg",
+            type: image.mime,
+          })
+        );
+      })
+      .catch(() => {});
   };
 
   const openDocument = async () => {
     setModalVisible(false);
     try {
       const results = await pick({ type: [types.allFiles] });
-      const payload = {
-        uri: results[0].uri,
-        fileName: results[0].name,
-        type: results[0].type,
-      };
-      dispatch(uploadFile(payload));
-    } catch (err) {
-      console.warn(err);
-    }
+      dispatch(
+        uploadFile({
+          uri: results[0].uri,
+          fileName: results[0].name,
+          type: results[0].type,
+        })
+      );
+    } catch {}
   };
 
   useEffect(() => {
-    if (responseUploadImage != null && isFocused) {
+    if (responseUploadImage && isFocused) {
       onSend(responseUploadImage.Location, 2);
       dispatch(clearUploadFileData());
     }
   }, [responseUploadImage]);
 
+  /* ================= HELPERS ================= */
+
   const getFileExtension = (url) =>
     url?.split(".").pop()?.split(/\#|\?/)[0] || "";
 
-  const getFileName = (url) => url?.split("/").pop()?.split(/\#|\?/)[0] || "";
+  const getFileName = (url) =>
+    url?.split("/").pop()?.split(/\#|\?/)[0] || "";
 
   const renderContent = (item) => {
     const isMe = item.senderType == 1;
+
     if (item.type === 2) {
-      if (
-        ["jpg", "jpeg", "png"].includes(getFileExtension(item.message).toLowerCase())
-      ) {
+      const ext = getFileExtension(item.message).toLowerCase();
+
+      if (["jpg", "jpeg", "png"].includes(ext)) {
         return (
           <TouchableOpacity
-            onPress={() => navigation.navigate("ViewImage", { uri: item.message })}
+            onPress={() =>
+              navigation.navigate("ViewImage", { uri: item.message })
+            }
           >
-            <Image
-              source={{ uri: item.message }}
-              style={styles.imageMessage}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: item.message }} style={styles.imageMessage} />
           </TouchableOpacity>
         );
-      } else if (getFileExtension(item.message).toLowerCase() === "pdf") {
+      }
+
+      if (ext === "pdf") {
         return (
           <TouchableOpacity
             style={styles.pdfContainer}
@@ -202,7 +199,10 @@ const Chat = ({ navigation }) => {
           >
             <PdfIcon height={36} width={36} />
             <Text
-              style={[styles.pdfText, { color: isMe ? "#fff" : appColors.black }]}
+              style={[
+                styles.pdfText,
+                { color: isMe ? "#fff" : appColors.black },
+              ]}
               numberOfLines={1}
             >
               {getFileName(item.message)}
@@ -210,54 +210,34 @@ const Chat = ({ navigation }) => {
           </TouchableOpacity>
         );
       }
-    } else {
-      return (
-        <Text style={[styles.messageText, { color: isMe ? "#fff" : "#333" }]}>
-          {item.message}
-        </Text>
-      );
     }
+
+    return (
+      <Text style={[styles.messageText, { color: isMe ? "#fff" : "#333" }]}>
+        {item.message}
+      </Text>
+    );
   };
 
-    function showPermissionDeniedAlert() {
-      Alert.alert(
-        "The MDHouse",
-        "You denied permissions. Enable permission from settings.",
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-          {
-            text: "OK",
-            onPress: () => {
-              Linking.openSettings().catch(() => {
-                Alert.alert("Error", "Unable to open settings");
-              });
-            },
-          },
-        ]
-      );
-    }
+  /* ================= UI ================= */
 
-  // ===== UI =====
   return (
     <View style={styles.containerStyle}>
-      {/* Header */}
+      {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon height={28} width={28} fill="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Chat</Text>
       </View>
 
-      {/* ✅ Keyboard Safe Chat + Input */}
+      {/* KEYBOARD SAFE AREA */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={80} // only added for keyboard overlap fix
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
-
+        {/* CHAT LIST */}
         {!isProgress ? (
           messages ? (
             <FlatList
@@ -265,9 +245,12 @@ const Chat = ({ navigation }) => {
               data={messages}
               keyExtractor={(_, i) => i.toString()}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.messageList}
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
+              contentContainerStyle={[
+                styles.messageList,
+                { paddingBottom: 10 },
+              ]}
               renderItem={({ item }) => {
                 const isMe = item.senderType == 1;
                 return (
@@ -281,14 +264,19 @@ const Chat = ({ navigation }) => {
                       style={[
                         styles.messageBubble,
                         {
-                          backgroundColor: isMe ? appColors.primaryColor : "#fff",
-                          borderTopRightRadius: isMe ? 0 : 16,
-                          borderTopLeftRadius: isMe ? 16 : 0,
+                          backgroundColor: isMe
+                            ? appColors.primaryColor
+                            : "#fff",
                         },
                       ]}
                     >
                       {renderContent(item)}
-                      <Text style={[styles.messageTime, { color: isMe ? "#ddd" : "#555" }]}>
+                      <Text
+                        style={[
+                          styles.messageTime,
+                          { color: isMe ? "#ddd" : "#555" },
+                        ]}
+                      >
                         {moment(item.createdAt).format("DD MMM, hh:mm A")}
                       </Text>
                     </View>
@@ -302,27 +290,24 @@ const Chat = ({ navigation }) => {
             </View>
           )
         ) : (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" />
-          </View>
+          <ActivityIndicator style={{ flex: 1 }} />
         )}
 
-        {/* Input (now always above keyboard) */}
+        {/* INPUT */}
         <View style={styles.inputContainer}>
-          <TouchableOpacity onPress={openModal} style={{ paddingHorizontal: 6 }}>
+          <TouchableOpacity onPress={openModal}>
             <AttachmentIcon height={28} width={28} />
           </TouchableOpacity>
 
           <TextInput
             style={styles.inputBox}
             placeholder="Type a message..."
-            placeholderTextColor="#777"
             value={message}
             onChangeText={setMessage}
             multiline
           />
 
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
             <Text style={styles.sendText}>Send</Text>
           </TouchableOpacity>
         </View>
@@ -334,7 +319,6 @@ const Chat = ({ navigation }) => {
           onGallery={openGallery}
           onDocument={openDocument}
         />
-
       </KeyboardAvoidingView>
     </View>
   );

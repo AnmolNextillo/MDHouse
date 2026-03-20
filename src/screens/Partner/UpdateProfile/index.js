@@ -7,36 +7,60 @@ import {
   TouchableOpacity,
   View,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { SafeAreaView } from "react-native-safe-area-context";
-import DownIcon from "../../../assets/svgs/DownIcon";
 import ImagePicker from "react-native-image-crop-picker";
 import { useDispatch, useSelector } from "react-redux";
-import { clearUpdateProfile, hitUpdateProfile } from "../../../redux/AgentUpdateProfileSlice";
-import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
+
+import {
+  clearUpdateProfile,
+  hitUpdateProfile,
+} from "../../../redux/AgentUpdateProfileSlice";
+
+import {
+  clearUploadFileData,
+  uploadFile,
+} from "../../../redux/uploadFile";
+
+import {
+  clearGetProfile,
+  hitGetProfile,
+} from "../../../redux/GetProfileSlice";
 
 const UpdateProfile = ({ navigation }) => {
   const dispatch = useDispatch();
+
+  /* ================= REDUX ================= */
 
   const responseUpdateProfile = useSelector(
     (state) => state.agentUpdateProfileReducer.data
   );
 
+  const responseUploadImage = useSelector(
+    (state) => state.uploadFileReducer.data
+  );
+
+  const responseGetProfile = useSelector(
+    (state) => state.getProfileReducer.data
+  );
+
   /* ================= STATES ================= */
+
+  const [loading, setLoading] = useState(true);
 
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [mobile, setMobile] = useState("");
   const [officeContact, setOfficeContact] = useState("");
   const [address, setAddress] = useState("");
-  const [email, setEmail] = useState("");
   const [gst, setGst] = useState("");
   const [aadhaar, setAadhaar] = useState("");
   const [pan, setPan] = useState("");
-    const [key, setKey] = useState(null);
+  const [key, setKey] = useState(null);
 
   const [images, setImages] = useState({
     panImage: null,
@@ -44,43 +68,89 @@ const UpdateProfile = ({ navigation }) => {
     aadhaarBack: null,
   });
 
-  const responseUploadImage = useSelector((state) => state.uploadFileReducer.data);
+  /* ================= GET PROFILE ================= */
+
+  useEffect(() => {
+    dispatch(hitGetProfile());
+  }, []);
+
+  useEffect(() => {
+    if (responseGetProfile) {
+      if (responseGetProfile.status === 1) {
+        const data = responseGetProfile.data;
+
+        setName(data.name || "");
+        setCompanyName(data.companyName || "");
+        setMobile(data.mobileNumber || "");
+        setOfficeContact(data.officeNumber || "");
+        setAddress(data.headOfficeAddress || "");
+        setGst(data.gst || "");
+        setAadhaar(data.adhaarNumber || "");
+        setPan(data.panCard || "");
+
+        setImages({
+          panImage: data.panCardImage || null,
+          aadhaarFront: data.aadhaarImageFront || null,
+          aadhaarBack: data.aadhaarImageBack || null,
+        });
+      } else {
+        Alert.alert("MD House", responseGetProfile.message);
+      }
+
+      setLoading(false);
+      dispatch(clearGetProfile());
+    }
+  }, [responseGetProfile]);
 
   /* ================= IMAGE PICK ================= */
 
-//   const pickImage = async (key) => {
-//     try {
-//       const image = await ImagePicker.openPicker({
-//         width: 400,
-//         height: 400,
-//         cropping: true,
-//       });
+  const pickImage = async (key) => {
+    try {
+      setKey(key);
 
-//       setImages({ ...images, [key]: image.path });
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
+      const image = await ImagePicker.openPicker({
+        width: 400,
+        height: 400,
+        cropping: true,
+      });
 
-      const pickImage = async (key) => {
-        try {
-           setKey(key);
-            const image = await ImagePicker.openPicker({
-                width: 400,
-                height: 400,
-                cropping: true,
-            });
-           
-           console.log("Key ====> ",key)
-            dispatch(uploadFile({ uri: image.path, fileName: image.filename, type: image.mime }));
-            // setImages({ ...images, [key]: image.path });
-        } catch (e) { }
-    };
+      dispatch(
+        uploadFile({
+          uri: image.path,
+          fileName: image.filename || "image.jpg",
+          type: image.mime,
+        })
+      );
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (responseUploadImage != null && key) {
+      setImages((prev) => ({
+        ...prev,
+        [key]: responseUploadImage.Location,
+      }));
+
+      dispatch(clearUploadFileData());
+    }
+  }, [responseUploadImage]);
 
   /* ================= SUBMIT ================= */
 
   const handleSubmit = () => {
-    if (!name || !mobile || !images.panImage || !images.aadhaarFront || !images.aadhaarBack || !companyName || !officeContact || !address || !gst || !aadhaar || !pan) {
+    if (
+      !name ||
+      !mobile ||
+      !images.panImage ||
+      !images.aadhaarFront ||
+      !images.aadhaarBack ||
+      !companyName ||
+      !officeContact ||
+      !address ||
+      !gst ||
+      !aadhaar ||
+      !pan
+    ) {
       Alert.alert("MD House", "Please fill required fields");
       return;
     }
@@ -89,11 +159,11 @@ const UpdateProfile = ({ navigation }) => {
       name,
       companyName,
       mobileNumber: mobile,
-      officeNumber:officeContact,
-      headOfficeAddress:address,
+      officeNumber: officeContact,
+      headOfficeAddress: address,
       gst,
-      adhaarNumber:aadhaar,
-      panCard:pan,
+      adhaarNumber: aadhaar,
+      panCard: pan,
       panCardImage: images.panImage,
       aadhaarImageFront: images.aadhaarFront,
       aadhaarImageBack: images.aadhaarBack,
@@ -102,7 +172,7 @@ const UpdateProfile = ({ navigation }) => {
     dispatch(hitUpdateProfile(payload));
   };
 
-  /* ================= RESPONSE ================= */
+  /* ================= UPDATE RESPONSE ================= */
 
   useEffect(() => {
     if (responseUpdateProfile) {
@@ -116,15 +186,6 @@ const UpdateProfile = ({ navigation }) => {
       dispatch(clearUpdateProfile());
     }
   }, [responseUpdateProfile]);
-
-   useEffect(() => {
-          if (responseUploadImage != null) {
-              // setReceiptUrl(responseUploadImage.Location);
-              console.log("Key ===> ", key, " Response Location ====> ", responseUploadImage.Location)
-              setImages({ ...images, [key]: responseUploadImage.Location });
-              dispatch(clearUploadFileData());
-          }
-      }, [responseUploadImage]);
 
   /* ================= COMMON INPUT ================= */
 
@@ -145,16 +206,16 @@ const UpdateProfile = ({ navigation }) => {
 
   /* ================= IMAGE UI ================= */
 
-  const renderImage = (label, key) => (
+  const renderImage = (label, keyName) => (
     <>
       <Text style={styles.labelStyle}>{label}</Text>
 
       <TouchableOpacity
         style={styles.imageBox}
-        onPress={() => pickImage(key)}
+        onPress={() => pickImage(keyName)}
       >
-        {images[key] ? (
-          <Image source={{ uri: images[key] }} style={styles.image} />
+        {images[keyName] ? (
+          <Image source={{ uri: images[keyName] }} style={styles.image} />
         ) : (
           <Text style={{ color: appColors.grey }}>Select Image</Text>
         )}
@@ -163,6 +224,14 @@ const UpdateProfile = ({ navigation }) => {
   );
 
   /* ================= UI ================= */
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color={appColors.primaryColor} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.constainerStyle}>
@@ -275,5 +344,11 @@ const styles = StyleSheet.create({
     color: appColors.white,
     fontSize: 16,
     fontWeight: "600",
+  },
+
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

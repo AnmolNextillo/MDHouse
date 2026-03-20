@@ -1,19 +1,20 @@
 // src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ApiBaseUrl, notifications } from "../utils/constants";
+import { agentNotifications, ApiBaseUrl, notifications } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const hitNotificationApi = createAsyncThunk("hitNotificationApi", async (payload) => {
   try {
     const token = await AsyncStorage.getItem('token');
+    const storedUserType = await AsyncStorage.getItem("userType");
     const config = {
       headers: {
         "Content-Type": "application/json",
         Authorization:token
       },
     };
-    const url = ApiBaseUrl + notifications;
+    const url = ApiBaseUrl + (storedUserType == 3 ? agentNotifications : notifications);
     console.log("URL ====> ",url)
     const response = await axios.get(url,config);
     console.log("Response Get Notifications===> ",response.data);

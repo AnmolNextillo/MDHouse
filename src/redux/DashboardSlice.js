@@ -1,19 +1,20 @@
 // src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ApiBaseUrl, dashboard, getChat } from "../utils/constants";
+import { agentDashboard, ApiBaseUrl, dashboard, getChat } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const hitDashboardApi = createAsyncThunk("hitDashboardApi", async (payload) => {
   try {
     const token = await AsyncStorage.getItem('token');
+    const storedUserType = await AsyncStorage.getItem("userType");
     const config = {
       headers: {
         "Content-Type": "application/json",
         Authorization:token
       },
     };
-    const url = ApiBaseUrl + dashboard;
+    const url = ApiBaseUrl + (storedUserType == 3 ? agentDashboard : dashboard);
     console.log("URL ====> ",url)
     const response = await axios.get(url,config);
     console.log("Response Dashboard===> ",response.data);
