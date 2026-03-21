@@ -15,38 +15,41 @@ import { hitAgentStudentList } from "../../../redux/AgentStudentListSlice";
 import { useIsFocused } from "@react-navigation/native";
 
 const StudentList = ({ navigation }) => {
-//   const students = [
-//     { id: "1", name: "John Doe", mobile: "9876543210" },
-//   ]; // replace with API data
+  //   const students = [
+  //     { id: "1", name: "John Doe", mobile: "9876543210" },
+  //   ]; // replace with API data
 
-const isFocused = useIsFocused();
+  const isFocused = useIsFocused();
 
-const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState([]);
 
   const dispatch = useDispatch();
   const responseStudentList = useSelector(
     (state) => state.agentStudentListReducer.data
   );
 
-  useEffect(()=>{
-    if(isFocused){
+  useEffect(() => {
+    if (isFocused) {
       dispatch(hitAgentStudentList());
     }
     // dispatch(hitAgentStudentList());
-  },[isFocused])
+  }, [isFocused])
 
-  useEffect(()=>{
-    if(responseStudentList && responseStudentList.status == 1){
-        setStudents(responseStudentList.data);
+  useEffect(() => {
+    if (responseStudentList && responseStudentList.status == 1) {
+      setStudents(responseStudentList.data);
     }
-  },[responseStudentList])
+  }, [responseStudentList])
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate("StudentDetails", { student: item })}
+    >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image
           source={{
-            uri:item.profileImage,
+            uri: item.profileImage,
           }}
           style={styles.profile}
         />
@@ -56,7 +59,7 @@ const [students, setStudents] = useState([]);
           <Text style={styles.mobile}>Email : {item.email}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -148,7 +151,7 @@ const styles = StyleSheet.create({
   fabText: {
     fontSize: 36,
     color: "#fff",
-    textAlign:'center',
-    marginBottom:4
+    textAlign: 'center',
+    marginBottom: 4
   },
 });

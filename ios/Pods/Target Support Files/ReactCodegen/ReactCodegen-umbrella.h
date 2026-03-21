@@ -46,6 +46,8 @@
 #import "react/renderer/components/safeareacontext/States.h"
 #import "rnasyncstorage/rnasyncstorage.h"
 #import "rnasyncstorageJSI.h"
+#import "RNCImageCropPickerSpec/RNCImageCropPickerSpec.h"
+#import "RNCImageCropPickerSpecJSI.h"
 #import "RNDateTimePickerCGen/RNDateTimePickerCGen.h"
 #import "RNDateTimePickerCGenJSI.h"
 #import "RNGoogleSignInCGen/RNGoogleSignInCGen.h"
