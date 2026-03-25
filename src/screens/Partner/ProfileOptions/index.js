@@ -31,7 +31,8 @@ import DocumentPickerModal from "../../../components/DocumentPickerModal";
 import { requestAllPermissions } from "../../../utils/constants";
 import ImagePicker from "react-native-image-crop-picker";
 import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
-import { hitUpdateProfile } from "../../../redux/UpdateProfileSlice";
+import { hitUpdateProfile } from "../../../redux/AgentUpdateProfileSlice";
+
 
 const ProfileOptions = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,7 +64,7 @@ const ProfileOptions = ({ navigation }) => {
   useEffect(() => {
     if (responseProfileData != null && responseProfileData.status == 1) {
       setProfileData(responseProfileData.data);
-      setProfileImage(responseProfileData.data.panCardImage)
+      setProfileImage(responseProfileData.data.profileImage);
     }
   }, [responseProfileData]);
 
@@ -228,21 +229,23 @@ const ProfileOptions = ({ navigation }) => {
       });
   };
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   if (profileData!= null && profileData.studentType == 2 && responseUploadImage != null) {
-  //     setProfileImage(responseUploadImage.Location);
-  //     setImageModalVisible(false);
+    if (responseUploadImage != null) {
+      setProfileImage(responseUploadImage.Location);
+      setImageModalVisible(false);
 
-  //     const payload = {
-  //       profileImage: responseUploadImage.Location,
+      const payload = {
+        profileImage: responseUploadImage.Location,
 
-  //     };
-  //     dispatch(hitUpdateProfile(payload));
-  //   }
+      };
+      if(isFocused){
+      dispatch(hitUpdateProfile(payload));
+      }
+    }
 
-  //   dispatch(clearUploadFileData());
-  // }, [responseUploadImage]);
+    dispatch(clearUploadFileData());
+  }, [responseUploadImage]);
 
   return (
     <SafeAreaView style={styles.constainerStyle}>
@@ -280,7 +283,7 @@ const ProfileOptions = ({ navigation }) => {
                   style={styles.imagePicker}
                   onPress={() =>
                     navigation.navigate("ViewImage", {
-                      uri: profileData.panCardImage,
+                      uri: profileData.profileImage,
                     })
                   }
                 >

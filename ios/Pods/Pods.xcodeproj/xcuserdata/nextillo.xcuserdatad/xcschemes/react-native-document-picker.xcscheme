@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E680D404027294343007D2107E67F7E5"
-               BuildableName = "RNScreenshotPrevent.framework"
-               BlueprintName = "RNScreenshotPrevent"
+               BlueprintIdentifier = "D11E74324175FE5B0E78DB046527F233"
+               BuildableName = "react_native_document_picker.framework"
+               BlueprintName = "react-native-document-picker"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

@@ -1,7 +1,7 @@
 // src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { agentStudentList, agentUpdateProfile, ApiBaseUrl, updateProfile } from "../utils/constants";
+import { agentStudentList, ApiBaseUrl } from "../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const hitAgentStudentList = createAsyncThunk("hitAgentStudentList", async (payload) => {

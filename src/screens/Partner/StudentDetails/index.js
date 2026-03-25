@@ -52,9 +52,11 @@ const StudentDetails = ({ navigation, route }) => {
   console.log("Student Details:", student);
 
   const handleUpdate = () => {
+     navigation.goBack();
     navigation.navigate("AddStudent", {
       student: student,
     });
+   
   };
 
   return (

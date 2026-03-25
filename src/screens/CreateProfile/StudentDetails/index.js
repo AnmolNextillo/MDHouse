@@ -85,8 +85,10 @@ const StudentDetials = ({ navigation, route }) => {
   /* ================= API CALL ================= */
 
   useEffect(() => {
+    if (isFocused) {
     dispatch(hitGetProfile({usertype:1}));
-  }, []);
+    }
+  }, [isFocused]);
 
   const addStudentDetails = async () => {
     if (!name) {

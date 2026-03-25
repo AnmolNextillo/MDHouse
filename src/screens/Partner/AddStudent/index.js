@@ -7,25 +7,30 @@ import {
   View,
   Image,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ImagePicker from "react-native-image-crop-picker";
-import { pick } from "@react-native-documents/picker";
+import DocumentPicker from "react-native-document-picker";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearAgentAddStudent,
   hitAgentAddStudent,
 } from "../../../redux/AgentAddStudentSlice";
-import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
-import { clearUpdateStudent, hitUpdateStudent } from "../../../redux/UpdateStudentSlice";
+import {
+  clearUploadFileData,
+  uploadFile,
+} from "../../../redux/uploadFile";
+import {
+  clearUpdateStudent,
+  hitUpdateStudent,
+} from "../../../redux/UpdateStudentSlice";
 
 const AddStudent = ({ navigation, route }) => {
   const dispatch = useDispatch();
-
-  /* ================= STATES ================= */
 
   const { student } = route.params || {};
   const isEdit = !!student;
@@ -38,7 +43,7 @@ const AddStudent = ({ navigation, route }) => {
 
   const [currentKey, setCurrentKey] = useState(null);
   const [uploadingKey, setUploadingKey] = useState(null);
-  const [showSheet, setShowSheet] = useState(false); // ✅ bottom sheet
+  const [showSheet, setShowSheet] = useState(false);
 
   const [images, setImages] = useState({
     profile: "",
@@ -55,39 +60,40 @@ const AddStudent = ({ navigation, route }) => {
   /* ================= REDUX ================= */
 
   const responseAddStudent = useSelector(
-    (state) => state.agentAddStudentReducer.data,
+    (state) => state.agentAddStudentReducer.data
   );
 
   const responseUploadImage = useSelector(
-    (state) => state.uploadFileReducer.data,
+    (state) => state.uploadFileReducer.data
   );
 
   const responseUpdateStudent = useSelector(
-  (state) => state.updateStudentReducer.data
-);
+    (state) => state.updateStudentReducer.data
+  );
 
+  /* ================= PREFILL ================= */
 
   useEffect(() => {
-  if (isEdit && student) {
-    setForm({
-      name: student.name || "",
-      email: student.email || "",
-      mobile: student.mobileNumber || "",
-    });
+    if (isEdit && student) {
+      setForm({
+        name: student.name || "",
+        email: student.email || "",
+        mobile: student.mobileNumber || "",
+      });
 
-    setImages({
-      profile: student.profileImage || "",
-      pan: student.panImage || "",
-      marksheet: student.plusTwoImage || "",
-      passportFront: student.passportImageFront || "",
-      passportBack: student.passportImageBack || "",
-      aadhaarFront: student.aadhaarImageFront || "",
-      aadhaarBack: student.aadhaarImageBack || "",
-      neet: student.neetImage || "",
-      ratios: {},
-    });
-  }
-}, [student]);
+      setImages({
+        profile: student.profileImage || "",
+        pan: student.panImage || "",
+        marksheet: student.plusTwoImage || "",
+        passportFront: student.passportImageFront || "",
+        passportBack: student.passportImageBack || "",
+        aadhaarFront: student.aadhaarImageFront || "",
+        aadhaarBack: student.aadhaarImageBack || "",
+        neet: student.neetImage || "",
+        ratios: {},
+      });
+    }
+  }, [student]);
 
   /* ================= INPUT ================= */
 
@@ -99,7 +105,7 @@ const AddStudent = ({ navigation, route }) => {
 
   const showPickerOptions = (key) => {
     setCurrentKey(key);
-    setShowSheet(true); // open sheet
+    setShowSheet(true);
   };
 
   const handleOptionSelect = async (type, key) => {
@@ -108,21 +114,37 @@ const AddStudent = ({ navigation, route }) => {
 
       let file;
 
+      // CAMERA
       if (type === 1) {
-        file = await ImagePicker.openCamera({ cropping: false });
+        const res = await ImagePicker.openCamera({ cropping: false });
+        file = {
+          path: res.path,
+          filename: res.filename || "image.jpg",
+          mime: res.mime,
+        };
       }
 
+      // GALLERY
       if (type === 2) {
-        file = await ImagePicker.openPicker({ cropping: false });
+        const res = await ImagePicker.openPicker({ cropping: false });
+        file = {
+          path: res.path,
+          filename: res.filename || "image.jpg",
+          mime: res.mime,
+        };
       }
 
+      // DOCUMENT (FIXED)
       if (type === 3) {
-        const res = await pick({ type: ["*/*"] });
+        const res = await DocumentPicker.pickSingle({
+          type: [DocumentPicker.types.allFiles],
+          copyTo: "cachesDirectory",
+        });
 
         file = {
-          path: res[0].uri,
-          filename: res[0].name,
-          mime: res[0].type,
+          path: res.fileCopyUri || res.uri,
+          filename: res.name || "file",
+          mime: res.type || "application/octet-stream",
         };
       }
 
@@ -130,6 +152,13 @@ const AddStudent = ({ navigation, route }) => {
 
       setUploadingKey(key);
 
+      // FIX URI FOR IOS
+      const fileUri =
+        Platform.OS === "ios"
+          ? file.path.replace("file://", "")
+          : file.path;
+
+      // IMAGE RATIO
       if (file.mime?.includes("image")) {
         Image.getSize(file.path, (w, h) => {
           setImages((prev) => ({
@@ -141,13 +170,15 @@ const AddStudent = ({ navigation, route }) => {
 
       dispatch(
         uploadFile({
-          uri: file.path,
-          fileName: file.filename || "file",
+          uri: fileUri,
+          fileName: file.filename,
           type: file.mime,
-        }),
+        })
       );
     } catch (e) {
-      console.log("Picker Error:", e);
+      if (!DocumentPicker.isCancel(e)) {
+        console.log("Picker Error:", e);
+      }
       setUploadingKey(null);
     }
   };
@@ -168,50 +199,50 @@ const AddStudent = ({ navigation, route }) => {
 
   /* ================= SUBMIT ================= */
 
-const handleSubmit = () => {
-  if (!form.name || !form.mobile || !form.email || !images.profile) {
-    alert("Name, Mobile, Email and Profile required");
-    return;
-  }
+  const handleSubmit = () => {
+    if (!form.name || !form.mobile || !form.email || !images.profile) {
+      alert("Name, Mobile, Email and Profile required");
+      return;
+    }
 
-  const payload = {
-    id: student?._id, // 🔥 important for update
-    name: form.name,
-    email: form.email,
-    mobileNumber: form.mobile,
-    profileImage: images.profile,
-    aadhaarImageBack: images.aadhaarBack,
-    aadhaarImageFront: images.aadhaarFront,
-    plusTwoImage: images.marksheet,
-    passportImageBack: images.passportBack,
-    passportImageFront: images.passportFront,
-    neetImage: images.neet,
+    const payload = {
+      id: student?._id,
+      name: form.name,
+      email: form.email,
+      mobileNumber: form.mobile,
+      profileImage: images.profile,
+      aadhaarImageBack: images.aadhaarBack,
+      aadhaarImageFront: images.aadhaarFront,
+      plusTwoImage: images.marksheet,
+      passportImageBack: images.passportBack,
+      passportImageFront: images.passportFront,
+      neetImage: images.neet,
+    };
+
+    if (isEdit) {
+      dispatch(hitUpdateStudent(payload));
+    } else {
+      dispatch(hitAgentAddStudent(payload));
+    }
   };
-
-  if (isEdit) {
-    dispatch(hitUpdateStudent(payload)); // 🔥 update API
-  } else {
-    dispatch(hitAgentAddStudent(payload)); // 🔥 add API
-  }
-};
 
   /* ================= RESPONSE ================= */
 
   useEffect(() => {
     if (responseAddStudent?.status === 1) {
-      alert("Student added successfully.");
+      alert("Student added successfully");
       dispatch(clearAgentAddStudent());
       navigation.goBack();
     }
   }, [responseAddStudent]);
 
   useEffect(() => {
-  if (responseUpdateStudent?.status === 1) {
-    alert("Student updated successfully.");
-    dispatch(clearUpdateStudent());
-    navigation.goBack();
-  }
-}, [responseUpdateStudent]);
+    if (responseUpdateStudent?.status === 1) {
+      alert("Student updated successfully");
+      dispatch(clearUpdateStudent());
+      navigation.goBack();
+    }
+  }, [responseUpdateStudent]);
 
   /* ================= UI ================= */
 
@@ -246,7 +277,7 @@ const handleSubmit = () => {
           {isUploading ? (
             <ActivityIndicator size="large" color={appColors.primaryColor} />
           ) : images[key] ? (
-            images[key].includes(".pdf") ? (
+            images[key]?.toLowerCase().includes(".pdf") ? (
               <Text style={{ color: appColors.primaryColor }}>
                 📄 {images[key].split("/").pop()}
               </Text>
@@ -266,12 +297,13 @@ const handleSubmit = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon width={32} height={32} fill="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Add Student</Text>
+        <Text style={styles.headerText}>
+          {isEdit ? "Update Student" : "Add Student"}
+        </Text>
       </View>
 
       <ScrollView>
@@ -289,21 +321,19 @@ const handleSubmit = () => {
         {renderImage("NEET Result", "neet")}
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.btnText}>{isEdit ? "Update" : "Save"} Student</Text>
+          <Text style={styles.btnText}>
+            {isEdit ? "Update" : "Save"} Student
+          </Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* 🔥 PREMIUM BOTTOM SHEET */}
       {showSheet && (
         <View style={styles.sheetOverlay}>
           <TouchableOpacity
             style={styles.overlayBg}
-            activeOpacity={1}
             onPress={() => setShowSheet(false)}
           />
-
           <View style={styles.bottomSheet}>
-            <View style={styles.dragHandle} />
             <Text style={styles.sheetTitle}>Upload From</Text>
 
             <View style={styles.optionContainer}>
@@ -311,33 +341,23 @@ const handleSubmit = () => {
                 style={styles.optionCard}
                 onPress={() => handleOptionSelect(1, currentKey)}
               >
-                <Text style={styles.icon}>📷</Text>
-                <Text style={styles.optionText}>Camera</Text>
+                <Text>📷 Camera</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.optionCard}
                 onPress={() => handleOptionSelect(2, currentKey)}
               >
-                <Text style={styles.icon}>🖼️</Text>
-                <Text style={styles.optionText}>Gallery</Text>
+                <Text>🖼️ Gallery</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.optionCard}
                 onPress={() => handleOptionSelect(3, currentKey)}
               >
-                <Text style={styles.icon}>📄</Text>
-                <Text style={styles.optionText}>Document</Text>
+                <Text>📄 Document</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              style={styles.cancelBtn}
-              onPress={() => setShowSheet(false)}
-            >
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -408,8 +428,6 @@ const styles = StyleSheet.create({
 
   btnText: { color: "#fff", fontWeight: "600" },
 
-  /* 🔥 Bottom Sheet Styles */
-
   sheetOverlay: {
     position: "absolute",
     width: "100%",
@@ -424,24 +442,15 @@ const styles = StyleSheet.create({
 
   bottomSheet: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
     padding: 20,
-  },
-
-  dragHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: "#ccc",
-    borderRadius: 10,
-    alignSelf: "center",
-    marginBottom: 10,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 
   sheetTitle: {
     textAlign: "center",
-    fontWeight: "600",
     marginBottom: 15,
+    fontWeight: "600",
   },
 
   optionContainer: {
@@ -451,27 +460,10 @@ const styles = StyleSheet.create({
 
   optionCard: {
     flex: 1,
-    marginHorizontal: 5,
-    backgroundColor: "#f5f5f5",
+    margin: 5,
     padding: 15,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-
-  icon: { fontSize: 24 },
-
-  optionText: { marginTop: 5 },
-
-  cancelBtn: {
-    marginTop: 15,
-    backgroundColor: "#eee",
-    padding: 12,
+    backgroundColor: "#f5f5f5",
     borderRadius: 10,
     alignItems: "center",
-  },
-
-  cancelText: {
-    color: "red",
-    fontWeight: "600",
   },
 });
