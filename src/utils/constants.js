@@ -33,6 +33,7 @@ export const partnerProfile  = "agent/getProfile";
 export const agentUpdateProfile  = "agent/updateProfile";
 export const agentStudentList  = "agent/studentList";
 export const agentAddStudent  = "agent/addStudent";
+export const agentUpdateStudent  = "agent/updateStudent";
 export const agentNotifications  = "agent/notifications";
 export const agentDashboard  = "agent/dashboard";
 export const getChatWithAdmin  = "agent/getChatWithAdmin";

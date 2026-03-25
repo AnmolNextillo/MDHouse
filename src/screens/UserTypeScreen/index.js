@@ -48,9 +48,17 @@ const UserTypeScreen = ({ navigation }) => {
                     <Animatable.View animation="fadeInLeft" delay={500}>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => handleSelect("student")}
+                            onPress={() => handleSelect("student",{isAlumni:false})}
                         >
                             <Text style={styles.buttonText}>Student</Text>
+                        </TouchableOpacity>
+                    </Animatable.View>
+                    <Animatable.View animation="fadeInLeft" delay={500}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => handleSelect("student",{isAlumni:true})}
+                        >
+                            <Text style={styles.buttonText}>Alumni</Text>
                         </TouchableOpacity>
                     </Animatable.View>
 

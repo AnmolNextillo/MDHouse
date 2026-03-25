@@ -1,5 +1,4 @@
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +13,7 @@ import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ImagePicker from "react-native-image-crop-picker";
+import { pick } from "@react-native-documents/picker";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -21,36 +21,19 @@ import {
   hitUpdateProfile,
 } from "../../../redux/AgentUpdateProfileSlice";
 
-import {
-  clearUploadFileData,
-  uploadFile,
-} from "../../../redux/uploadFile";
+import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
 
-import {
-  clearGetProfile,
-  hitGetProfile,
-} from "../../../redux/GetProfileSlice";
+import { clearGetProfile, hitGetProfile } from "../../../redux/GetProfileSlice";
 
 const UpdateProfile = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  /* ================= REDUX ================= */
-
-  const responseUpdateProfile = useSelector(
-    (state) => state.agentUpdateProfileReducer.data
-  );
-
-  const responseUploadImage = useSelector(
-    (state) => state.uploadFileReducer.data
-  );
-
-  const responseGetProfile = useSelector(
-    (state) => state.getProfileReducer.data
-  );
-
   /* ================= STATES ================= */
 
   const [loading, setLoading] = useState(true);
+  const [uploadingKey, setUploadingKey] = useState(null);
+  const [showSheet, setShowSheet] = useState(false);
+  const [currentKey, setCurrentKey] = useState(null);
 
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -60,13 +43,27 @@ const UpdateProfile = ({ navigation }) => {
   const [gst, setGst] = useState("");
   const [aadhaar, setAadhaar] = useState("");
   const [pan, setPan] = useState("");
-  const [key, setKey] = useState(null);
 
   const [images, setImages] = useState({
     panImage: null,
     aadhaarFront: null,
     aadhaarBack: null,
+    ratios: {},
   });
+
+  /* ================= REDUX ================= */
+
+  const responseUpdateProfile = useSelector(
+    (state) => state.agentUpdateProfileReducer.data,
+  );
+
+  const responseUploadImage = useSelector(
+    (state) => state.uploadFileReducer.data,
+  );
+
+  const responseGetProfile = useSelector(
+    (state) => state.getProfileReducer.data,
+  );
 
   /* ================= GET PROFILE ================= */
 
@@ -92,9 +89,8 @@ const UpdateProfile = ({ navigation }) => {
           panImage: data.panCardImage || null,
           aadhaarFront: data.aadhaarImageFront || null,
           aadhaarBack: data.aadhaarImageBack || null,
+          ratios: {},
         });
-      } else {
-        Alert.alert("MD House", responseGetProfile.message);
       }
 
       setLoading(false);
@@ -102,35 +98,73 @@ const UpdateProfile = ({ navigation }) => {
     }
   }, [responseGetProfile]);
 
-  /* ================= IMAGE PICK ================= */
+  /* ================= PICK OPTIONS ================= */
 
-  const pickImage = async (key) => {
+  const showPickerOptions = (key) => {
+    setCurrentKey(key);
+    setShowSheet(true);
+  };
+
+  const handlePick = async (type, key) => {
     try {
-      setKey(key);
+      setShowSheet(false);
 
-      const image = await ImagePicker.openPicker({
-        width: 400,
-        height: 400,
-        cropping: true,
-      });
+      let file;
+
+      if (type === 1) {
+        file = await ImagePicker.openCamera({ cropping: false });
+      }
+
+      if (type === 2) {
+        file = await ImagePicker.openPicker({ cropping: false });
+      }
+
+      if (type === 3) {
+        const res = await pick({ type: ["*/*"] });
+
+        file = {
+          path: res[0].uri,
+          filename: res[0].name,
+          mime: res[0].type,
+        };
+      }
+
+      if (!file) return;
+
+      setUploadingKey(key);
+
+      if (file.mime?.includes("image")) {
+        Image.getSize(file.path, (w, h) => {
+          setImages((prev) => ({
+            ...prev,
+            ratios: { ...prev.ratios, [key]: w / h },
+          }));
+        });
+      }
 
       dispatch(
         uploadFile({
-          uri: image.path,
-          fileName: image.filename || "image.jpg",
-          type: image.mime,
-        })
+          uri: file.path,
+          fileName: file.filename || "file",
+          type: file.mime,
+        }),
       );
-    } catch (e) {}
+    } catch (e) {
+      console.log("Picker Error:", e);
+      setUploadingKey(null);
+    }
   };
 
+  /* ================= UPLOAD RESPONSE ================= */
+
   useEffect(() => {
-    if (responseUploadImage != null && key) {
+    if (responseUploadImage && currentKey) {
       setImages((prev) => ({
         ...prev,
-        [key]: responseUploadImage.Location,
+        [currentKey]: responseUploadImage.Location,
       }));
 
+      setUploadingKey(null);
       dispatch(clearUploadFileData());
     }
   }, [responseUploadImage]);
@@ -143,85 +177,74 @@ const UpdateProfile = ({ navigation }) => {
       !mobile ||
       !images.panImage ||
       !images.aadhaarFront ||
-      !images.aadhaarBack ||
-      !companyName ||
-      !officeContact ||
-      !address ||
-      !gst ||
-      !aadhaar ||
-      !pan
+      !images.aadhaarBack
     ) {
-      Alert.alert("MD House", "Please fill required fields");
+      alert("Please fill required fields");
       return;
     }
 
-    const payload = {
-      name,
-      companyName,
-      mobileNumber: mobile,
-      officeNumber: officeContact,
-      headOfficeAddress: address,
-      gst,
-      adhaarNumber: aadhaar,
-      panCard: pan,
-      panCardImage: images.panImage,
-      aadhaarImageFront: images.aadhaarFront,
-      aadhaarImageBack: images.aadhaarBack,
-    };
-
-    dispatch(hitUpdateProfile(payload));
+    dispatch(
+      hitUpdateProfile({
+        name,
+        companyName,
+        mobileNumber: mobile,
+        officeNumber: officeContact,
+        headOfficeAddress: address,
+        gst,
+        adhaarNumber: aadhaar,
+        panCard: pan,
+        panCardImage: images.panImage,
+        aadhaarImageFront: images.aadhaarFront,
+        aadhaarImageBack: images.aadhaarBack,
+      }),
+    );
   };
 
-  /* ================= UPDATE RESPONSE ================= */
+  /* ================= RESPONSE ================= */
 
   useEffect(() => {
     if (responseUpdateProfile) {
       if (responseUpdateProfile.status === 1) {
-        Alert.alert("MD House", "Profile Updated Successfully");
+        alert("Profile Updated Successfully");
         navigation.goBack();
-      } else {
-        Alert.alert("MD House", responseUpdateProfile.message);
       }
-
       dispatch(clearUpdateProfile());
     }
   }, [responseUpdateProfile]);
 
-  /* ================= COMMON INPUT ================= */
+  /* ================= IMAGE ================= */
 
-  const renderInput = (label, value, setter, keyboard = "default") => (
-    <>
-      <Text style={styles.labelStyle}>{label}</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          value={value}
-          onChangeText={setter}
-          style={styles.textInput}
-          keyboardType={keyboard}
-          placeholder={`Enter ${label}`}
-        />
-      </View>
-    </>
-  );
+  const renderImage = (label, keyName) => {
+    const ratio = images.ratios[keyName] || 1;
+    const isUploading = uploadingKey === keyName;
 
-  /* ================= IMAGE UI ================= */
+    return (
+      <>
+        <Text style={styles.label}>{label}</Text>
 
-  const renderImage = (label, keyName) => (
-    <>
-      <Text style={styles.labelStyle}>{label}</Text>
-
-      <TouchableOpacity
-        style={styles.imageBox}
-        onPress={() => pickImage(keyName)}
-      >
-        {images[keyName] ? (
-          <Image source={{ uri: images[keyName] }} style={styles.image} />
-        ) : (
-          <Text style={{ color: appColors.grey }}>Select Image</Text>
-        )}
-      </TouchableOpacity>
-    </>
-  );
+        <TouchableOpacity
+          style={styles.imageBox}
+          onPress={() => showPickerOptions(keyName)}
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <ActivityIndicator size="large" color={appColors.primaryColor} />
+          ) : images[keyName] ? (
+            images[keyName].includes(".pdf") ? (
+              <Text>📄 {images[keyName].split("/").pop()}</Text>
+            ) : (
+              <Image
+                source={{ uri: images[keyName] }}
+                style={[styles.image, { aspectRatio: ratio }]}
+              />
+            )
+          ) : (
+            <Text>Select Image / Document</Text>
+          )}
+        </TouchableOpacity>
+      </>
+    );
+  };
 
   /* ================= UI ================= */
 
@@ -234,33 +257,124 @@ const UpdateProfile = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.constainerStyle}>
+    <SafeAreaView style={styles.container}>
       {/* HEADER */}
-      <View style={styles.headerStyle}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackIcon height={32} width={32} fill={appColors.white} />
+          <BackIcon width={32} height={32} fill="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Update Profile</Text>
       </View>
 
       <ScrollView>
-        {renderInput("Name", name, setName)}
-        {renderInput("Company Name", companyName, setCompanyName)}
-        {renderInput("Mobile Number", mobile, setMobile, "phone-pad")}
-        {renderInput("Office Contact", officeContact, setOfficeContact, "phone-pad")}
-        {renderInput("Head Office Address", address, setAddress)}
-        {renderInput("GST Number", gst, setGst)}
-        {renderInput("Aadhaar Number", aadhaar, setAadhaar, "numeric")}
-        {renderInput("PAN Number", pan, setPan)}
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="Name"
+        />
+        <TextInput
+          style={styles.input}
+          value={companyName}
+          onChangeText={setCompanyName}
+          placeholder="Company Name"
+        />
+        <TextInput
+          style={styles.input}
+          value={mobile}
+          onChangeText={setMobile}
+          placeholder="Mobile"
+        />
+        <TextInput
+          style={styles.input}
+          value={officeContact}
+          onChangeText={setOfficeContact}
+          placeholder="Office Contact"
+        />
+        <TextInput
+          style={styles.input}
+          value={address}
+          onChangeText={setAddress}
+          placeholder="Address"
+        />
+        <TextInput
+          style={styles.input}
+          value={gst}
+          onChangeText={setGst}
+          placeholder="GST"
+        />
+        <TextInput
+          style={styles.input}
+          value={aadhaar}
+          onChangeText={setAadhaar}
+          placeholder="Aadhaar"
+        />
+        <TextInput
+          style={styles.input}
+          value={pan}
+          onChangeText={setPan}
+          placeholder="PAN"
+        />
 
-        {renderImage("PAN Card Photo", "panImage")}
-        {renderImage("Aadhaar Front Image", "aadhaarFront")}
-        {renderImage("Aadhaar Back Image", "aadhaarBack")}
+        {renderImage("PAN Card", "panImage")}
+        {renderImage("Aadhaar Front", "aadhaarFront")}
+        {renderImage("Aadhaar Back", "aadhaarBack")}
 
-        <TouchableOpacity style={styles.buttonStyle} onPress={handleSubmit}>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Update Profile</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* ================= BOTTOM SHEET ================= */}
+      {showSheet && (
+        <View style={styles.sheetOverlay}>
+          <TouchableOpacity
+            style={styles.overlayBg}
+            activeOpacity={1}
+            onPress={() => setShowSheet(false)}
+          />
+
+          <View style={styles.bottomSheet}>
+            {/* Drag Indicator */}
+            <View style={styles.dragHandle} />
+
+            <Text style={styles.sheetTitle}>Choose Upload Option</Text>
+
+            <View style={styles.optionContainer}>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={() => handlePick(1, currentKey)}
+              >
+                <Text style={styles.icon}>📷</Text>
+                <Text style={styles.optionText}>Camera</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={() => handlePick(2, currentKey)}
+              >
+                <Text style={styles.icon}>🖼️</Text>
+                <Text style={styles.optionText}>Gallery</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={() => handlePick(3, currentKey)}
+              >
+                <Text style={styles.icon}>📄</Text>
+                <Text style={styles.optionText}>Document</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={() => setShowSheet(false)}
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -270,85 +384,120 @@ export default UpdateProfile;
 /* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
-  constainerStyle: {
-    flex: 1,
-    backgroundColor: appColors.white,
-  },
-
-  headerStyle: {
+  container: { flex: 1 },
+  header: {
     flexDirection: "row",
-    paddingHorizontal: 8,
-    paddingVertical: 12,
     backgroundColor: appColors.primaryColor,
-    alignItems: "center",
+    padding: 12,
   },
+  headerText: { flex: 1, textAlign: "center", color: "#fff" },
 
-  headerText: {
-    fontSize: 16,
-    color: appColors.white,
-    textAlign: "center",
-    marginRight: 32,
-    flex: 1,
-  },
-
-  labelStyle: {
-    marginHorizontal: 18,
-    marginTop: 16,
-    fontWeight: "600",
-    fontSize: 16,
-    color: appColors.black,
-  },
-
-  inputContainer: {
+  input: {
     borderWidth: 1,
-    borderColor: appColors.grey,
+    margin: 10,
+    padding: 10,
     borderRadius: 8,
-    marginTop: 8,
-    height: 45,
-    paddingHorizontal: 8,
-    marginHorizontal: 16,
-    justifyContent: "center",
   },
 
-  textInput: {
-    color: appColors.black,
-  },
+  label: { marginLeft: 10, marginTop: 10 },
 
   imageBox: {
-    height: 120,
     borderWidth: 1,
-    borderColor: appColors.grey,
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginTop: 8,
-    justifyContent: "center",
+    margin: 10,
+    padding: 10,
     alignItems: "center",
-    overflow: "hidden",
   },
 
-  image: {
+  image: { width: "100%" },
+
+  button: {
+    backgroundColor: appColors.primaryColor,
+    margin: 20,
+    padding: 15,
+    alignItems: "center",
+  },
+
+  buttonText: { color: "#fff" },
+
+  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
+  sheetOverlay: {
+    position: "absolute",
     width: "100%",
     height: "100%",
+    justifyContent: "flex-end",
   },
 
-  buttonStyle: {
-    paddingVertical: 16,
-    backgroundColor: appColors.primaryColor,
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginVertical: 32,
-    borderRadius: 8,
+  overlayBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
 
-  buttonText: {
-    color: appColors.white,
+  bottomSheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingBottom: 25,
+    paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+
+  dragHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: "#ccc",
+    borderRadius: 10,
+    alignSelf: "center",
+    marginVertical: 10,
+  },
+
+  sheetTitle: {
+    textAlign: "center",
     fontSize: 16,
     fontWeight: "600",
+    marginBottom: 15,
+    color: "#333",
   },
 
-  loader: {
+  optionContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  optionCard: {
     flex: 1,
-    justifyContent: "center",
+    marginHorizontal: 5,
+    backgroundColor: "#f5f5f5",
+    paddingVertical: 18,
+    borderRadius: 15,
     alignItems: "center",
+  },
+
+  icon: {
+    fontSize: 26,
+    marginBottom: 6,
+  },
+
+  optionText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#333",
+  },
+
+  cancelBtn: {
+    marginTop: 20,
+    backgroundColor: "#f1f1f1",
+    padding: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+
+  cancelText: {
+    color: "red",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });

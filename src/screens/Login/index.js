@@ -32,12 +32,15 @@ import {
 } from "@invertase/react-native-apple-authentication";
 import BackIcon from "../../assets/svgs/BackIcon";
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation,routes }) => {
+  
+  const isAlumni = routes?.params?.isAlumni || false;
+  const [userType, setUserType] = useState(isAlumni ? "alumni" : "student"); // student | alumni
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
-  const [userType, setUserType] = useState(""); // student | alumni
+  // const [userType, setUserType] = useState(""); // student | alumni
 
   const responseLogin = useSelector((state) => state.loginReducer.data);
   const responseVersion = useSelector((state) => state.getVersionReducer.data);
@@ -256,7 +259,7 @@ const Login = ({ navigation }) => {
               <Text style={styles.title}>Welcome Back 👋</Text>
               <Text style={styles.subtitle}>Login to continue</Text>
 
-              <View style={styles.userTypeContainer}>
+              {/* <View style={styles.userTypeContainer}>
                 {["student", "alumni"].map((type) => (
                   <TouchableOpacity
                     key={type}
@@ -279,7 +282,7 @@ const Login = ({ navigation }) => {
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </View> */}
 
               {/* Email */}
               <Animatable.View

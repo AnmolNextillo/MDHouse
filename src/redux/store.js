@@ -28,6 +28,7 @@ import agentUpdateProfileReducer from './AgentUpdateProfileSlice';
 import agentStudentListReducer from './AgentStudentListSlice';  
 import agentAddStudentReducer from './AgentAddStudentSlice';
 import checkUserReducer from './CheckUserSlice';
+import updateStudentReducer from './UpdateStudentSlice';
  
 const store = configureStore({ 
   reducer: {
@@ -60,6 +61,7 @@ const store = configureStore({
    agentStudentListReducer:agentStudentListReducer,
    agentAddStudentReducer:agentAddStudentReducer,
    checkUserReducer:checkUserReducer,
+   updateStudentReducer:updateStudentReducer,
   },
 });
 
