@@ -29,6 +29,7 @@ import agentStudentListReducer from './AgentStudentListSlice';
 import agentAddStudentReducer from './AgentAddStudentSlice';
 import checkUserReducer from './CheckUserSlice';
 import updateStudentReducer from './UpdateStudentSlice';
+import studentDetailsReducer from './GetStudentDetailsSlice';
  
 const store = configureStore({ 
   reducer: {
@@ -62,6 +63,7 @@ const store = configureStore({
    agentAddStudentReducer:agentAddStudentReducer,
    checkUserReducer:checkUserReducer,
    updateStudentReducer:updateStudentReducer,
+   studentDetailsReducer:studentDetailsReducer,
   },
 });
 

@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { appColors } from "../../../utils/color";
@@ -16,7 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ImagePicker from "react-native-image-crop-picker";
 import * as DocumentPicker from "react-native-document-picker";
 import { useDispatch, useSelector } from "react-redux";
-
+import Pdf from "react-native-pdf";
 import {
   clearUpdateProfile,
   hitUpdateProfile,
@@ -37,7 +38,6 @@ const UpdateProfile = ({ navigation }) => {
   const [showSheet, setShowSheet] = useState(false);
   const [currentKey, setCurrentKey] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false); // ✅ FIX
 
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -47,9 +47,21 @@ const UpdateProfile = ({ navigation }) => {
     panImage: null,
     aadhaarFront: null,
     aadhaarBack: null,
-    ratios: {},
-    types: {},
   });
+
+  const [ratios, setRatios] = useState({});
+  const [types, setTypes] = useState({});
+  const [loadingFiles, setLoadingFiles] = useState({});
+
+  /* ================= HELPERS ================= */
+
+  const isPdf = (uri) => uri?.toLowerCase().includes(".pdf");
+
+  const handleImageLoad = (uri, key) => {
+    Image.getSize(uri, (w, h) => {
+      setRatios((prev) => ({ ...prev, [key]: w / h }));
+    });
+  };
 
   /* ================= REDUX ================= */
 
@@ -84,8 +96,6 @@ const UpdateProfile = ({ navigation }) => {
           panImage: data.panCardImage || null,
           aadhaarFront: data.aadhaarImageFront || null,
           aadhaarBack: data.aadhaarImageBack || null,
-          ratios: {},
-          types: {},
         });
       }
 
@@ -94,7 +104,7 @@ const UpdateProfile = ({ navigation }) => {
     }
   }, [responseGetProfile]);
 
-  /* ================= PICK OPTIONS ================= */
+  /* ================= PICK ================= */
 
   const showPickerOptions = (key) => {
     setCurrentKey(key);
@@ -131,15 +141,6 @@ const UpdateProfile = ({ navigation }) => {
 
       setUploadingKey(key);
 
-      if (file.mime?.includes("image")) {
-        Image.getSize(file.path, (w, h) => {
-          setImages((prev) => ({
-            ...prev,
-            ratios: { ...prev.ratios, [key]: w / h },
-          }));
-        });
-      }
-
       dispatch(
         uploadFile({
           uri: file.path,
@@ -148,9 +149,6 @@ const UpdateProfile = ({ navigation }) => {
         })
       );
     } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
-        console.log("Picker Error:", e);
-      }
       setUploadingKey(null);
     }
   };
@@ -162,10 +160,11 @@ const UpdateProfile = ({ navigation }) => {
       setImages((prev) => ({
         ...prev,
         [currentKey]: responseUploadImage.Location,
-        types: {
-          ...prev.types,
-          [currentKey]: responseUploadImage.ContentType || "",
-        },
+      }));
+
+      setTypes((prev) => ({
+        ...prev,
+        [currentKey]: responseUploadImage.ContentType || "",
       }));
 
       setUploadingKey(null);
@@ -176,19 +175,12 @@ const UpdateProfile = ({ navigation }) => {
   /* ================= SUBMIT ================= */
 
   const handleSubmit = () => {
-    if (
-      !name ||
-      !mobile ||
-      !images.panImage ||
-      !images.aadhaarFront ||
-      !images.aadhaarBack
-    ) {
+    if (!name || !mobile || !images.panImage) {
       alert("Please fill required fields");
       return;
     }
 
     setSubmitting(true);
-    setIsUpdating(true); // ✅ IMPORTANT
 
     dispatch(
       hitUpdateProfile({
@@ -202,56 +194,95 @@ const UpdateProfile = ({ navigation }) => {
     );
   };
 
-  /* ================= RESPONSE ================= */
-
   useEffect(() => {
-    if (responseUpdateProfile && isUpdating) {
+    if (responseUpdateProfile) {
       setSubmitting(false);
-      setIsUpdating(false);
 
       if (responseUpdateProfile.status === 1) {
         alert("Profile Updated Successfully");
-        navigation.goBack(); // ✅ only when user updates
-      } else {
-        alert(responseUpdateProfile.message || "Something went wrong");
+        dispatch(clearUpdateProfile());
+        navigation.goBack();
       }
-
-      dispatch(clearUpdateProfile());
     }
   }, [responseUpdateProfile]);
 
-  /* ================= RENDER ================= */
+  /* ================= RENDER FILE ================= */
 
-  const renderImage = (label, keyName) => {
-    const ratio = images.ratios[keyName] || 1;
-    const isUploading = uploadingKey === keyName;
-    const type = images.types?.[keyName] || "";
+  const renderFile = (label, uri, key) => {
+    if (!uri) {
+      return (
+        <>
+          <Text style={styles.label}>{label}</Text>
+          <TouchableOpacity
+            style={styles.imageBox}
+            onPress={() => showPickerOptions(key)}
+          >
+            <Text>Select Image / PDF</Text>
+          </TouchableOpacity>
+        </>
+      );
+    }
+
+    const ratio = ratios[key] || 1;
 
     return (
-      <>
+      <View style={styles.imageContainer}>
         <Text style={styles.label}>{label}</Text>
 
-        <TouchableOpacity
-          style={styles.imageBox}
-          onPress={() => showPickerOptions(keyName)}
-          disabled={isUploading}
-        >
-          {isUploading ? (
-            <ActivityIndicator size="large" color={appColors.primaryColor} />
-          ) : images[keyName] ? (
-            type.includes("pdf") ? (
-              <Text style={{ fontSize: 16 }}>📄 PDF Uploaded</Text>
-            ) : (
-              <Image
-                source={{ uri: images[keyName] }}
-                style={[styles.image, { aspectRatio: ratio }]}
+        <TouchableOpacity onPress={() => showPickerOptions(key)}>
+          {isPdf(uri) ? (
+            <View style={styles.pdfContainer}>
+              {loadingFiles[key] && <ActivityIndicator />}
+
+              <Pdf
+                source={{ uri }}
+                style={styles.pdf}
+                onLoadStart={() =>
+                  setLoadingFiles((p) => ({ ...p, [key]: true }))
+                }
+                onLoadComplete={() =>
+                  setLoadingFiles((p) => ({ ...p, [key]: false }))
+                }
+                onError={() =>
+                  setLoadingFiles((p) => ({ ...p, [key]: false }))
+                }
               />
-            )
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  style={styles.openBtn}
+                  onPress={() => Linking.openURL(uri)}
+                >
+                  <Text style={styles.openText}>Open PDF</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.changeBtn}
+                  onPress={() => showPickerOptions(key)}
+                >
+                  <Text style={styles.openText}>Change</Text>
+                </TouchableOpacity>
+              </View>
+
+
+            </View>
           ) : (
-            <Text>Select Image / Document</Text>
+            <View style={styles.imageBox}>
+              <Image
+                source={{ uri }}
+                style={[styles.image, { aspectRatio: ratio }]}
+                resizeMode="contain"
+                onLoad={() => handleImageLoad(uri, key)}
+              />
+              <TouchableOpacity
+                style={styles.changeBtn}
+                onPress={() => showPickerOptions(key)}
+              >
+                <Text style={styles.openText}>Change</Text>
+              </TouchableOpacity>
+            </View>
+
           )}
         </TouchableOpacity>
-      </>
+      </View>
     );
   };
 
@@ -279,45 +310,52 @@ const UpdateProfile = ({ navigation }) => {
         <TextInput style={styles.input} value={companyName} onChangeText={setCompanyName} placeholder="Company Name" />
         <TextInput style={styles.input} value={mobile} onChangeText={setMobile} placeholder="Mobile" />
 
-        {renderImage("PAN Card", "panImage")}
-        {renderImage("Aadhaar Front", "aadhaarFront")}
-        {renderImage("Aadhaar Back", "aadhaarBack")}
+        {renderFile("PAN Card", images.panImage, "panImage")}
+        {renderFile("Aadhaar Front", images.aadhaarFront, "aadhaarFront")}
+        {renderFile("Aadhaar Back", images.aadhaarBack, "aadhaarBack")}
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={submitting}>
-          {submitting ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Update Profile</Text>
-          )}
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Update Profile</Text>}
         </TouchableOpacity>
       </ScrollView>
-
       {showSheet && (
         <View style={styles.sheetOverlay}>
-          <TouchableOpacity style={styles.overlayBg} onPress={() => setShowSheet(false)} />
+          <TouchableOpacity
+            style={styles.overlayBg}
+            onPress={() => setShowSheet(false)}
+          />
 
           <View style={styles.bottomSheet}>
-            <View style={styles.dragHandle} />
-            <Text style={styles.sheetTitle}>Choose Upload Option</Text>
+            <Text style={styles.sheetTitle}>Upload From</Text>
 
             <View style={styles.optionContainer}>
-              <TouchableOpacity style={styles.optionCard} onPress={() => handlePick(1, currentKey)}>
-                <Text style={styles.icon}>📷</Text>
-                <Text style={styles.optionText}>Camera</Text>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={() => handleOptionSelect(1, currentKey)}
+              >
+                <Text>📷 Camera</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.optionCard} onPress={() => handlePick(2, currentKey)}>
-                <Text style={styles.icon}>🖼️</Text>
-                <Text style={styles.optionText}>Gallery</Text>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={() => handleOptionSelect(2, currentKey)}
+              >
+                <Text>🖼️ Gallery</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.optionCard} onPress={() => handlePick(3, currentKey)}>
-                <Text style={styles.icon}>📄</Text>
-                <Text style={styles.optionText}>PDF</Text>
+              <TouchableOpacity
+                style={styles.optionCard}
+                onPress={() => handleOptionSelect(3, currentKey)}
+              >
+                <Text>📄 Document</Text>
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowSheet(false)}>
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setShowSheet(false)}
+            >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -328,6 +366,7 @@ const UpdateProfile = ({ navigation }) => {
 };
 
 export default UpdateProfile;
+
 /* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
@@ -345,7 +384,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
   },
 
   input: {
@@ -355,21 +393,49 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
-  label: {
-    marginLeft: 10,
-    marginTop: 10,
-    fontWeight: "500",
-  },
+  label: { marginLeft: 10, marginTop: 10 },
 
   imageBox: {
     borderWidth: 1,
     margin: 10,
-    padding: 10,
-    alignItems: "center",
+    padding: 15,
     borderRadius: 8,
   },
 
+  imageContainer: { marginBottom: 10 },
+
   image: { width: "100%" },
+
+  pdfContainer: {
+    height: 300,
+    margin: 10,
+  },
+
+  pdf: {
+    flex: 1,
+    width: "100%",
+  },
+
+  openBtn: {
+    flex: 1,
+    marginTop: 10,
+    backgroundColor: appColors.primaryColor,
+    padding: 10,
+    borderRadius: 6,
+    marginHorizontal: 10,
+    alignItems: "center",
+  },
+  changeBtn: {
+    flex: 1,
+    marginTop: 10,
+    backgroundColor: appColors.black,
+    padding: 10,
+    borderRadius: 6,
+    marginHorizontal: 10,
+    alignItems: "center",
+  },
+
+  openText: { color: "#fff" },
 
   button: {
     backgroundColor: appColors.primaryColor,
@@ -379,14 +445,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
-  buttonText: { color: "#fff", fontWeight: "600" },
+  buttonText: { color: "#fff" },
 
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
-
   sheetOverlay: {
     position: "absolute",
-    width,
-    height,
+    width: width,
+    height: height,
     justifyContent: "flex-end",
   },
 
@@ -397,26 +462,15 @@ const styles = StyleSheet.create({
 
   bottomSheet: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    paddingBottom: 40,
-    paddingHorizontal: 20,
-  },
-
-  dragHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: "#ccc",
-    borderRadius: 10,
-    alignSelf: "center",
-    marginVertical: 10,
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 
   sheetTitle: {
     textAlign: "center",
-    fontSize: 16,
-    fontWeight: "600",
     marginBottom: 15,
+    fontWeight: "600",
   },
 
   optionContainer: {
@@ -426,28 +480,24 @@ const styles = StyleSheet.create({
 
   optionCard: {
     flex: 1,
-    marginHorizontal: 5,
+    margin: 5,
+    paddingVertical: 15,
     backgroundColor: "#f5f5f5",
-    paddingVertical: 18,
-    borderRadius: 15,
+    borderRadius: 10,
     alignItems: "center",
+    justifyContent: "center",
   },
-
-  icon: { fontSize: 26, marginBottom: 6 },
-
-  optionText: { fontSize: 13, fontWeight: "500" },
-
-  cancelBtn: {
-    marginTop: 20,
-    backgroundColor: "#f1f1f1",
-    padding: 14,
-    borderRadius: 12,
+  cancelButton: {
+    marginTop: 15,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderColor: "#eee",
     alignItems: "center",
   },
 
   cancelText: {
-    color: "red",
+    fontSize: 16,
     fontWeight: "600",
-    fontSize: 15,
+    color: "red",
   },
 });

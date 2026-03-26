@@ -38,6 +38,7 @@ export const agentNotifications  = "agent/notifications";
 export const agentDashboard  = "agent/dashboard";
 export const getChatWithAdmin  = "agent/getChatWithAdmin";
 export const sendMessageToAdmin  = "agent/sendMessageToAdmin";
+export const getStudentDetails  = "agent/getStudentDetails";
 
 
 export async function requestAllPermissions() {

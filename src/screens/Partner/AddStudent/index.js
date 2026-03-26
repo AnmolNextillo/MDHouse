@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   Platform,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { appColors } from "../../../utils/color";
@@ -28,6 +29,9 @@ import {
   clearUpdateStudent,
   hitUpdateStudent,
 } from "../../../redux/UpdateStudentSlice";
+
+
+const { width, height } = Dimensions.get("window");
 
 const AddStudent = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -206,7 +210,7 @@ const AddStudent = ({ navigation, route }) => {
     }
 
     const payload = {
-      id: student?._id,
+      studentId: student?._id,
       name: form.name,
       email: form.email,
       mobileNumber: form.mobile,
@@ -333,6 +337,7 @@ const AddStudent = ({ navigation, route }) => {
             style={styles.overlayBg}
             onPress={() => setShowSheet(false)}
           />
+
           <View style={styles.bottomSheet}>
             <Text style={styles.sheetTitle}>Upload From</Text>
 
@@ -358,6 +363,14 @@ const AddStudent = ({ navigation, route }) => {
                 <Text>📄 Document</Text>
               </TouchableOpacity>
             </View>
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setShowSheet(false)}
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -430,8 +443,8 @@ const styles = StyleSheet.create({
 
   sheetOverlay: {
     position: "absolute",
-    width: "100%",
-    height: "100%",
+    width: width,
+    height: height,
     justifyContent: "flex-end",
   },
 
@@ -466,4 +479,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
+  cancelButton: {
+  marginTop: 15,
+  paddingVertical: 12,
+  borderTopWidth: 1,
+  borderColor: "#eee",
+  alignItems: "center",
+},
+
+cancelText: {
+  fontSize: 16,
+  fontWeight: "600",
+  color: "red",
+},
 });

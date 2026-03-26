@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,18 +6,48 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Linking,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { appColors } from "../../../utils/color";
+import { useDispatch, useSelector } from "react-redux";
+import { hitStudentDetials } from "../../../redux/GetStudentDetailsSlice";
+import { useIsFocused } from "@react-navigation/native";
+import Pdf from "react-native-pdf";
 
 const StudentDetails = ({ navigation, route }) => {
   const { student } = route.params || {};
 
-  // 🔥 store dynamic ratios
   const [ratios, setRatios] = useState({});
+  const [studentData, setStudentData] = useState(null);
+  const [loadingFiles, setLoadingFiles] = useState({});
 
-  /* ================= IMAGE RATIO HANDLER ================= */
+  const dispatch = useDispatch();
+  const studentResponse = useSelector(
+    (state) => state.studentDetailsReducer.data
+  );
+
+  const isFocused = useIsFocused();
+
+  /* ================= FETCH DATA ================= */
+  useEffect(() => {
+    if (student && isFocused) {
+      dispatch(hitStudentDetials({ studentId: student._id }));
+    }
+  }, [student, isFocused]);
+
+  useEffect(() => {
+    if (studentResponse && studentResponse.status === 1) {
+      setStudentData(studentResponse.data);
+    }
+  }, [studentResponse]);
+
+  /* ================= HELPERS ================= */
+
+  const isPdf = (uri) => uri?.toLowerCase().includes(".pdf");
+
   const handleImageLoad = (uri, key) => {
     Image.getSize(
       uri,
@@ -25,12 +55,13 @@ const StudentDetails = ({ navigation, route }) => {
         const ratio = width / height;
         setRatios((prev) => ({ ...prev, [key]: ratio }));
       },
-      () => {},
+      () => {}
     );
   };
 
-  /* ================= IMAGE RENDER ================= */
-  const renderImage = (label, uri, key) => {
+  /* ================= FILE RENDER ================= */
+
+  const renderFile = (label, uri, key) => {
     if (!uri) return null;
 
     const ratio = ratios[key] || 1;
@@ -39,25 +70,57 @@ const StudentDetails = ({ navigation, route }) => {
       <View style={styles.imageContainer}>
         <Text style={styles.label}>{label}</Text>
 
-        <Image
-          source={{ uri }}
-          style={[styles.image, { aspectRatio: ratio }]}
-          resizeMode="contain"
-          onLoad={() => handleImageLoad(uri, key)}
-        />
+        {isPdf(uri) ? (
+          <View style={styles.pdfContainer}>
+            {loadingFiles[key] && (
+              <ActivityIndicator
+                size="small"
+                color={appColors.primaryColor}
+              />
+            )}
+
+            <Pdf
+              source={{ uri }}
+              style={styles.pdf}
+              onLoadStart={() =>
+                setLoadingFiles((p) => ({ ...p, [key]: true }))
+              }
+              onLoadComplete={() =>
+                setLoadingFiles((p) => ({ ...p, [key]: false }))
+              }
+              onError={() =>
+                setLoadingFiles((p) => ({ ...p, [key]: false }))
+              }
+            />
+
+            <TouchableOpacity
+              style={styles.openBtn}
+              onPress={() => Linking.openURL(uri)}
+            >
+              <Text style={styles.openText}>Open PDF</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Image
+            source={{ uri }}
+            style={[styles.image, { aspectRatio: ratio }]}
+            resizeMode="contain"
+            onLoad={() => handleImageLoad(uri, key)}
+          />
+        )}
       </View>
     );
   };
 
-  console.log("Student Details:", student);
+  /* ================= NAVIGATION ================= */
 
   const handleUpdate = () => {
-     navigation.goBack();
     navigation.navigate("AddStudent", {
-      student: student,
+      student: studentData,
     });
-   
   };
+
+  /* ================= UI ================= */
 
   return (
     <SafeAreaView style={styles.container}>
@@ -70,38 +133,57 @@ const StudentDetails = ({ navigation, route }) => {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {/* PROFILE (PASSPORT STYLE) */}
+        {/* PROFILE */}
         <View style={styles.profileContainer}>
           <Image
-            source={{ uri: student?.profileImage }}
+            source={{ uri: studentData?.profileImage }}
             style={styles.profile}
-            resizeMode="cover"
           />
-          <Text style={styles.name}>{student?.name}</Text>
-          <Text style={styles.info}>+91 {student?.mobileNumber}</Text>
-          <Text style={styles.info}>{student?.email}</Text>
+          <Text style={styles.name}>{studentData?.name}</Text>
+          <Text style={styles.info}>
+            +91 {studentData?.mobileNumber}
+          </Text>
+          <Text style={styles.info}>{studentData?.email}</Text>
         </View>
 
         {/* DOCUMENTS */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Documents</Text>
 
-          {renderImage("10+2 Marksheet", student?.plusTwoImage, "plusTwo")}
-          {renderImage(
+          {renderFile(
+            "10+2 Marksheet",
+            studentData?.plusTwoImage,
+            "plusTwo"
+          )}
+          {renderFile(
             "Passport Front",
-            student?.passportImageFront,
-            "passFront",
+            studentData?.passportImageFront,
+            "passFront"
           )}
-          {renderImage("Passport Back", student?.passportBack, "passBack")}
-          {renderImage(
+          {renderFile(
+            "Passport Back",
+            studentData?.passportBack,
+            "passBack"
+          )}
+          {renderFile(
             "Aadhar Front",
-            student?.aadhaarImageFront,
-            "aadhaarFront",
+            studentData?.aadhaarImageFront,
+            "aadhaarFront"
           )}
-          {renderImage("Aadhar Back", student?.aadhaarImageBack, "aadhaarBack")}
-          {renderImage("NEET Result", student?.neetImage, "neet")}
+          {renderFile(
+            "Aadhar Back",
+            studentData?.aadhaarImageBack,
+            "aadhaarBack"
+          )}
+          {renderFile(
+            "NEET Result",
+            studentData?.neetImage,
+            "neet"
+          )}
         </View>
       </ScrollView>
+
+      {/* EDIT BUTTON */}
       <TouchableOpacity style={styles.fab} onPress={handleUpdate}>
         <Text style={styles.fabText}>✏️ Edit</Text>
       </TouchableOpacity>
@@ -129,12 +211,11 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     textAlign: "center",
-    color: appColors.white,
+    color: "#fff",
     fontSize: 16,
     marginRight: 32,
   },
 
-  /* ✅ PASSPORT STYLE PROFILE */
   profileContainer: {
     alignItems: "center",
     marginBottom: 20,
@@ -142,7 +223,7 @@ const styles = StyleSheet.create({
 
   profile: {
     width: 120,
-    height: 140, // 🔥 passport ratio (slightly taller)
+    height: 140,
     borderRadius: 10,
     marginBottom: 10,
     borderWidth: 1,
@@ -183,10 +264,33 @@ const styles = StyleSheet.create({
     color: appColors.black,
   },
 
-  /* 🔥 DYNAMIC IMAGE FIX */
   image: {
     width: "100%",
     borderRadius: 8,
+  },
+
+  pdfContainer: {
+    height: 200,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+
+  pdf: {
+    flex: 1,
+    width: "100%",
+  },
+
+  openBtn: {
+    marginTop: 8,
+    backgroundColor: appColors.primaryColor,
+    padding: 10,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+
+  openText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 
   fab: {
@@ -198,10 +302,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 30,
     elevation: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
   },
 
   fabText: {
