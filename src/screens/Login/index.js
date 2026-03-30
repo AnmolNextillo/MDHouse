@@ -33,9 +33,9 @@ import {
 import BackIcon from "../../assets/svgs/BackIcon";
 
 const Login = ({ navigation,routes }) => {
+
   
-  const isAlumni = routes?.params?.isAlumni || false;
-  const [userType, setUserType] = useState(isAlumni ? "alumni" : "student"); // student | alumni
+  const [userType, setUserType] = useState(0); // student | alumni
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -51,8 +51,15 @@ const Login = ({ navigation,routes }) => {
 
   // ✅ Initial API call
   useEffect(() => {
+    setUser();
     dispatch(hitVersionApi());
   }, []);
+
+  const setUser = async () => {
+    const type = await AsyncStorage.getItem("userType");
+    console.log("User Type from storage: ", type);
+    setUserType(type);
+  };
 
   // ✅ Save FCM token
   useEffect(() => {
@@ -75,7 +82,7 @@ const Login = ({ navigation,routes }) => {
     } else if (!password) {
       Alert.alert("MD House", "Please enter Password.");
     } else {
-      const payload = { email, password, fcmToken, studentType: userType == "student" ? 1 : 2 };
+      const payload = { email, password, fcmToken, studentType: userType };
       dispatch(hitLogin(payload));
     }
   };
@@ -117,7 +124,7 @@ const Login = ({ navigation,routes }) => {
   // ✅ Handle login response
   useEffect(() => {
     if (responseLogin) {
-      if (responseLogin.status === 1) saveToken(responseLogin);
+      if (responseLogin.status === 1)  navigation.navigate("OtpScreen", { id:responseLogin.data._id, userType:"student" });
       else Alert.alert("MD House", responseLogin.message);
       dispatch(clearLoginData());
     }
@@ -186,7 +193,7 @@ const Login = ({ navigation,routes }) => {
         googleId: userInfo.data.user.id,
         email: userInfo.data.user.email,
         fcmToken: fcmToken,
-        studentType: userType == "student" ? 1 : 2,
+        studentType: userType,
       };
       dispatch(hitGoogleLogin(payload));
     } catch (error) {
@@ -210,7 +217,7 @@ const Login = ({ navigation,routes }) => {
         googleId: user,
         email: email,
         fcmToken: fcmToken,
-        studentType: userType == "student" ? 1 : 2,
+        studentType: userType,
         type: "apple",
       };
       dispatch(hitGoogleLogin(payload));

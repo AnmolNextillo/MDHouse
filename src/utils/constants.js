@@ -1,44 +1,49 @@
 
 import { PermissionsAndroid, Platform } from "react-native";
-export const ApiBaseUrl = "https://api-mdhouse.erptech.info/v1/"
+export const ApiBaseUrl = "https://api-mdhouse.erptech.info/"
 
-export const signUp = "student/signUp";
-export const login  = "student/login";
-export const forgot  = "student/forgotPassword";
-export const updateProfile  = "student/updateProfile";
-export const profile  = "student/profile";
-export const deleteAccount  = "student/delete";
-export const versions  = "student/versions";
-export const notifications  = "student/notifications";
-export const getChat  = "student/getChat";
-export const sendMessage  = "student/sendMessage";
-export const dashboard  = "student/dashboard";
-export const getUniversityList  = "student/getUniversityList";
-export const googleLogin  = "student/googleLogin";
-export const getTelexRecord  = "student/getTelexRecord";
-export const getAgentList  = "student/getAgentList";
-export const applyForTelex  = "student/applyForTelex";
-export const getResult  = "student/getResult";
-export const issueReports  = "student/issueReports";
-export const settings  = "student/settings";
-export const getGallery  = "student/getGallery";
-export const studentAchievements  = "student/studentAchievements";
-export const getAttendance  = "student/getAttendance";
-export const home  = "student/home";
-export const checkUser  = "checkUser";
+export const signUp = "v1/student/signUp";
+export const login  = "v1/student/login";
+export const loginV2  = "v2/student/login";
+export const forgot  = "v1/student/forgotPassword";
+export const updateProfile  = "v1/student/updateProfile";
+export const profile  = "v1/student/profile";
+export const deleteAccount  = "v1/student/delete";
+export const versions  = "v1/student/versions";
+export const notifications  = "v1/student/notifications";
+export const getChat  = "v1/student/getChat";
+export const sendMessage  = "v1/student/sendMessage";
+export const dashboard  = "v1/student/dashboard";
+export const getUniversityList  = "v1/student/getUniversityList";
+export const googleLogin  = "v1/student/googleLogin";
+export const getTelexRecord  = "v1/student/getTelexRecord";
+export const getAgentList  = "v1/student/getAgentList";
+export const applyForTelex  = "v1/student/applyForTelex";
+export const getResult  = "v1/student/getResult";
+export const issueReports  = "v1/student/issueReports";
+export const settings  = "v1/student/settings";
+export const getGallery  = "v1/student/getGallery";
+export const studentAchievements  = "v1/student/studentAchievements";
+export const getAttendance  = "v1/student/getAttendance";
+export const home  = "v1/student/home";
+export const checkUser  = "v1/checkUser";
+export const studentOtp  = "v2/student/otpVerification";
+export const studentResendOtp  = "v2/student/resendOtp";
 
 // Partner APIs
-export const partnerLogin  = "agent/login";
-export const partnerProfile  = "agent/getProfile";
-export const agentUpdateProfile  = "agent/updateProfile";
-export const agentStudentList  = "agent/studentList";
-export const agentAddStudent  = "agent/addStudent";
-export const agentUpdateStudent  = "agent/updateStudent";
-export const agentNotifications  = "agent/notifications";
-export const agentDashboard  = "agent/dashboard";
-export const getChatWithAdmin  = "agent/getChatWithAdmin";
-export const sendMessageToAdmin  = "agent/sendMessageToAdmin";
-export const getStudentDetails  = "agent/getStudentDetails";
+export const partnerLogin  = "v2/agent/login";
+export const partnerProfile  = "v1/agent/getProfile";
+export const agentUpdateProfile  = "v1/agent/updateProfile";
+export const agentStudentList  = "v1/agent/studentList";
+export const agentAddStudent  = "v1/agent/addStudent";
+export const agentUpdateStudent  = "v1/agent/updateStudent";
+export const agentNotifications  = "v1/agent/notifications";
+export const agentDashboard  = "v1/agent/dashboard";
+export const getChatWithAdmin  = "v1/agent/getChatWithAdmin";
+export const sendMessageToAdmin  = "v1/agent/sendMessageToAdmin";
+export const getStudentDetails  = "v1/agent/getStudentDetails";
+export const agentOtp  = "v2/agent/otpVerification";
+export const agentResendOtp  = "v2/agent/resendOtp";
 
 
 export async function requestAllPermissions() {

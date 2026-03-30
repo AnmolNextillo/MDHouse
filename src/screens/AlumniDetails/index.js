@@ -25,8 +25,10 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import CountryCodeModal from "../../components/CountryCodeModal";
 
-const AlumniDetails = ({ navigation }) => {
+const AlumniDetails = ({ navigation,routes }) => {
   const dispatch = useDispatch();
+
+  const {from} = routes.params || {};
   const countriesCode = getCountries();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleCountry, setModalVisibleCountry] = useState(false);
@@ -172,12 +174,12 @@ const AlumniDetails = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.headerStyle}>
+      {from == 2&&<View style={styles.headerStyle}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon height={32} width={32} fill={appColors.white} />
         </TouchableOpacity>
         <Text style={styles.headerText}>Alumni Details</Text>
-      </View>
+      </View>}
 
       <KeyboardAwareScrollView
         contentContainerStyle={{ paddingBottom: 120 }}

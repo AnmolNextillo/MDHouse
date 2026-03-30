@@ -14,7 +14,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserTypeScreen = ({ navigation }) => {
     const handleSelect = async (type) => {
-        await AsyncStorage.setItem("userType", type);
+        console.log("Selected User Type: ", type);
+        const userTypeValue = type === "student" ? 1 : type === "alumni" ? 2 : 3;
+        console.log("User Type Value to store: ", String(userTypeValue));
+        await AsyncStorage.setItem("userType", String(userTypeValue));
         type === "partner" ? navigation.navigate("PartnerLogin")
             : navigation.navigate("Login");
     };
@@ -48,7 +51,7 @@ const UserTypeScreen = ({ navigation }) => {
                     <Animatable.View animation="fadeInLeft" delay={500}>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => handleSelect("student",{isAlumni:false})}
+                            onPress={() => handleSelect("student")}
                         >
                             <Text style={styles.buttonText}>Student</Text>
                         </TouchableOpacity>
@@ -56,7 +59,7 @@ const UserTypeScreen = ({ navigation }) => {
                     <Animatable.View animation="fadeInLeft" delay={500}>
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => handleSelect("student",{isAlumni:true})}
+                            onPress={() => handleSelect("alumni")}
                         >
                             <Text style={styles.buttonText}>Alumni</Text>
                         </TouchableOpacity>

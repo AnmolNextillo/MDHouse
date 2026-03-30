@@ -42,6 +42,9 @@ const UpdateProfile = ({ navigation }) => {
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [officeContact, setOfficeContact] = useState("");
+  const [headOfficeAddress, setHeadOfficeAddress] = useState("");
+  const [gst, setGst] = useState("");
 
   const [images, setImages] = useState({
     panImage: null,
@@ -91,6 +94,9 @@ const UpdateProfile = ({ navigation }) => {
         setName(data.name || "");
         setCompanyName(data.companyName || "");
         setMobile(data.mobileNumber || "");
+        setOfficeContact(data.officeNumber || "");
+        setHeadOfficeAddress(data.headOfficeAddress || "");
+        setGst(data.gst || "");
 
         setImages({
           panImage: data.panCardImage || null,
@@ -109,6 +115,81 @@ const UpdateProfile = ({ navigation }) => {
   const showPickerOptions = (key) => {
     setCurrentKey(key);
     setShowSheet(true);
+  };
+
+   const handleOptionSelect = async (type, key) => {
+    try {
+      setShowSheet(false);
+
+      let file;
+
+      // CAMERA
+      if (type === 1) {
+        const res = await ImagePicker.openCamera({ cropping: false });
+        file = {
+          path: res.path,
+          filename: res.filename || "image.jpg",
+          mime: res.mime,
+        };
+      }
+
+      // GALLERY
+      if (type === 2) {
+        const res = await ImagePicker.openPicker({ cropping: false });
+        file = {
+          path: res.path,
+          filename: res.filename || "image.jpg",
+          mime: res.mime,
+        };
+      }
+
+      // DOCUMENT (FIXED)
+      if (type === 3) {
+        const res = await DocumentPicker.pickSingle({
+          type: [DocumentPicker.types.allFiles],
+          copyTo: "cachesDirectory",
+        });
+
+        file = {
+          path: res.fileCopyUri || res.uri,
+          filename: res.name || "file",
+          mime: res.type || "application/octet-stream",
+        };
+      }
+
+      if (!file) return;
+
+      setUploadingKey(key);
+
+      // FIX URI FOR IOS
+      const fileUri =
+        Platform.OS === "ios"
+          ? file.path.replace("file://", "")
+          : file.path;
+
+      // IMAGE RATIO
+      if (file.mime?.includes("image")) {
+        Image.getSize(file.path, (w, h) => {
+          setImages((prev) => ({
+            ...prev,
+            ratios: { ...prev.ratios, [key]: w / h },
+          }));
+        });
+      }
+
+      dispatch(
+        uploadFile({
+          uri: fileUri,
+          fileName: file.filename,
+          type: file.mime,
+        })
+      );
+    } catch (e) {
+      if (!DocumentPicker.isCancel(e)) {
+        console.log("Picker Error:", e);
+      }
+      setUploadingKey(null);
+    }
   };
 
   const handlePick = async (type, key) => {
@@ -187,6 +268,9 @@ const UpdateProfile = ({ navigation }) => {
         name,
         companyName,
         mobileNumber: mobile,
+        officeNumber: officeContact,
+        headOfficeAddress,
+        gst,
         panCardImage: images.panImage,
         aadhaarImageFront: images.aadhaarFront,
         aadhaarImageBack: images.aadhaarBack,
@@ -306,9 +390,18 @@ const UpdateProfile = ({ navigation }) => {
       </View>
 
       <ScrollView>
+        <Text style={styles.label}>Name</Text>
         <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
-        <TextInput style={styles.input} value={companyName} onChangeText={setCompanyName} placeholder="Company Name" />
-        <TextInput style={styles.input} value={mobile} onChangeText={setMobile} placeholder="Mobile" />
+        <Text style={styles.label}>Company Name</Text>
+        <TextInput style={styles.input} value={companyName} onChangeText={setCompanyName} placeholder="Company Name"/>
+        <Text style={styles.label}>Mobile</Text>
+        <TextInput style={styles.input} value={mobile} onChangeText={setMobile} placeholder="Mobile" inputMode="tel"/>
+        <Text style={styles.label}>Office Contact Number</Text>
+        <TextInput style={styles.input} value={officeContact} onChangeText={setOfficeContact} placeholder="Office Contact Number" inputMode="tel"/>
+        <Text style={styles.label}>Head Office Address</Text>
+        <TextInput style={styles.input} value={headOfficeAddress} onChangeText={setHeadOfficeAddress} placeholder="Head Office Address" />
+        <Text style={styles.label}>GST</Text>
+        <TextInput style={styles.input} value={gst} onChangeText={setGst} placeholder="GST" />
 
         {renderFile("PAN Card", images.panImage, "panImage")}
         {renderFile("Aadhaar Front", images.aadhaarFront, "aadhaarFront")}
@@ -393,7 +486,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
-  label: { marginLeft: 10, marginTop: 10 },
+  label: { marginLeft: 10, marginTop: 10, fontWeight: "600" },
 
   imageBox: {
     borderWidth: 1,

@@ -63,6 +63,8 @@
 #import "RNGoogleSignInCGen/RNGoogleSignInCGen.h"
 #import "RNGoogleSignInCGenJSI.h"
 #import "rnscreens/rnscreens.h"
+#import "RNScreenshotPreventSpec/RNScreenshotPreventSpec.h"
+#import "RNScreenshotPreventSpecJSI.h"
 #import "rnscreensJSI.h"
 #import "rnsvg/rnsvg.h"
 #import "rnsvgJSI.h"

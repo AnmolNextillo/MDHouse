@@ -86,7 +86,9 @@ const PartnerLogin = ({ navigation }) => {
       console.log("Login Response Partner:", responseLogin);
     if (responseLogin) {
       
-      if (responseLogin.status === 1) saveToken(responseLogin);
+      if (responseLogin.status === 1){
+        navigation.navigate("OtpScreen", { id:responseLogin.data._id, userType:"partner" });
+      }
       else Alert.alert("MD House", responseLogin.message);
       dispatch(clearLoginData());
     }

@@ -49,6 +49,7 @@ import UpdateProfile from "./src/screens/Partner/UpdateProfile/index.js";
 import StudentList from "./src/screens/Partner/StudentList/index.js";
 import AddStudent from "./src/screens/Partner/AddStudent/index.js";
 import StudentDetails from "./src/screens/Partner/StudentDetails/index.js";
+import OtpScreen from "./src/screens/OtpScreen/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -107,8 +108,8 @@ const App = () => {
   // }, []);
 
   // useEffect(() => {
-    // Platform.OS === "ios" &&
-    //  useScreenSecurity();
+    Platform.OS === "ios" &&
+     useScreenSecurity();
   // }, []);
 
   useEffect(() => {
@@ -405,6 +406,7 @@ const App = () => {
               <Stack.Screen name="StudentList" component={StudentList} />
               <Stack.Screen name="AddStudent" component={AddStudent} />
               <Stack.Screen name="StudentDetails" component={StudentDetails} />
+              <Stack.Screen name="OtpScreen" component={OtpScreen} />
             </Stack.Navigator>
           </View>
         </NavigationContainer>

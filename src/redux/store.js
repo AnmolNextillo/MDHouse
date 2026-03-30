@@ -30,6 +30,8 @@ import agentAddStudentReducer from './AgentAddStudentSlice';
 import checkUserReducer from './CheckUserSlice';
 import updateStudentReducer from './UpdateStudentSlice';
 import studentDetailsReducer from './GetStudentDetailsSlice';
+import otpApiReducer from './OtpApiSlice';
+import resendOtpApiReducer from './AgentResendOtpSlice';
  
 const store = configureStore({ 
   reducer: {
@@ -64,6 +66,8 @@ const store = configureStore({
    checkUserReducer:checkUserReducer,
    updateStudentReducer:updateStudentReducer,
    studentDetailsReducer:studentDetailsReducer,
+   otpApiReducer:otpApiReducer,
+   resendOtpApiReducer:resendOtpApiReducer,
   },
 });
 

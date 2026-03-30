@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import LinearGradient from "react-native-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,7 +28,7 @@ import {
   AppleButton,
 } from "@invertase/react-native-apple-authentication";
 
-const SignUp = ({ navigation }) => {
+const SignUp = ({ navigation, routes }) => {
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");
@@ -36,12 +36,26 @@ const SignUp = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
-  const [userType, setUserType] = useState(""); // student | alumni
+  const [userType, setUserType] = useState(); // student | alumni
 
   const responseSignup = useSelector((state) => state.signupReducer.data);
   const responseGoogleLogin = useSelector(
     (state) => state.googleLoginReducer.data
   );
+
+  useEffect(() => {
+    const fetchUserType = async () => {
+      try {
+        const type = await AsyncStorage.getItem("userType");
+        console.log("User Type from storage: ", type);
+        setUserType(type);
+      } catch (error) {
+        console.error("Error fetching user type: ", error);
+      }
+    };
+
+    fetchUserType();
+  }, []);
 
   /* ---------------- Google Config ---------------- */
   useEffect(() => {
@@ -69,7 +83,7 @@ const SignUp = ({ navigation }) => {
       "step",
       JSON.stringify(loginData.data.step)
     );
-     await AsyncStorage.setItem("user", JSON.stringify(loginData.data.studentType));
+    await AsyncStorage.setItem("user", JSON.stringify(loginData.data.studentType));
 
     const routesMap = {
       1: "UniversityInfo",
@@ -79,7 +93,7 @@ const SignUp = ({ navigation }) => {
       5: "DocumentUpload",
     };
 
-    const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" :loginData.data.isProfileCompleted==1?"BottomBar": "AlumniDetails";
+    const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" : loginData.data.isProfileCompleted == 1 ? "BottomBar" : "AlumniDetails";
 
     navigation.reset({
       index: 0,
@@ -122,7 +136,7 @@ const SignUp = ({ navigation }) => {
           name,
           email,
           password,
-          studentType: userType == "student" ? 1 : 2,
+          studentType: userType,
           fcmToken,
         })
       );
@@ -146,6 +160,8 @@ const SignUp = ({ navigation }) => {
         fcmToken,
       };
 
+      console.log("Google Response ===> ", userInfo, " Payload ===> ", payload);
+
       dispatch(hitGoogleLogin(payload));
     } catch (error) {
       Alert.alert("MD House", "Google Sign-In failed");
@@ -165,6 +181,7 @@ const SignUp = ({ navigation }) => {
         requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
       });
 
+      console.log("Apple Response ===> ", res);
       dispatch(
         hitGoogleLogin({
           googleId: res.user,
@@ -199,7 +216,7 @@ const SignUp = ({ navigation }) => {
               <Text style={styles.title}>Sign Up</Text>
               <Text style={styles.subtitle}>Create your account</Text>
 
-              <View style={styles.userTypeContainer}>
+              {/* <View style={styles.userTypeContainer}>
                 {["student", "alumni"].map((type) => (
                   <TouchableOpacity
                     key={type}
@@ -222,7 +239,7 @@ const SignUp = ({ navigation }) => {
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </View> */}
 
               {/* Name */}
               <View style={styles.inputContainer}>
