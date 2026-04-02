@@ -18,6 +18,12 @@ import GalleryScreen from "../screens/GalleryScreen/index.js";
 import ProfileOptions from "../screens/Partner/ProfileOptions/index.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { hitCheckUser } from "../redux/CheckUserSlice.js";
+import AdminProfileOptions from "../screens/Admin/AdminProfileOption/index.js";
+import LogoutIcon from "../assets/svgs/LogoutIcon.js";
+import LogoutScreen from "../screens/Admin/LogoutScreen/index.js";
+import AdminHome from "../screens/Admin/AdminHome/index.js";
+import AdminChat from "../screens/Admin/AdminChat/index.js";
+import AdminNotifications from "../screens/Admin/AdminNotifications/index.js";
 
 // import HomeIcon from '../assets/svg/HomeIcon';
 // import TasksIcon from '../assets/svg/TasksIcon';
@@ -93,75 +99,136 @@ const Tabs = () => {
         },
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <HomeIconBtm
-              fill={focused ? appColors.primaryColor : appColors.black}
-              height={24}
-              width={24}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Gallery"
-        component={GalleryScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <GalleryIcon
-              fill={focused ? appColors.primaryColor : appColors.black}
-              height={24}
-              width={24}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Chat"
-        component={Chat}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <ChatIconBtm
-              stroke={focused ? appColors.primaryColor : appColors.black}
-              height={24}
-              width={24}
-            />
-          ),
-          tabBarBadge: dashboardData != null && dashboardData.unreadMessagesCount > 0 ? dashboardData.unreadMessagesCount : undefined,
-          tabBarStyle: { display: "none" },
-        }}
-      />
-      <Tab.Screen
-        name="Notification"
-        component={Notification}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <NotificationIcon
-              fill={focused ? appColors.primaryColor : appColors.black}
-              height={24}
-              width={24}
-            />
-          ),
-          tabBarBadge: dashboardData != null && dashboardData.unreadNotificationsCount > 0 ? dashboardData.unreadNotificationsCount : undefined, // show a number badge
-        }}
-      />
-     
-      {userType&&<Tab.Screen
-        name="Profile"
-        component={ userType==3?ProfileOptions:ProfileOptios}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <ProfileIconBtm
-              fill={focused ? appColors.primaryColor : appColors.black}
-              height={24}
-              width={24}
-            />
-          ),
-        }}
-      />}
+      {userType && userType == 4 ? (
+        <>
+          <Tab.Screen
+            name="Home"
+            component={AdminHome}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <HomeIconBtm
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Chat"
+            component={AdminChat}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <ChatIconBtm
+                  stroke={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+              tabBarBadge: dashboardData != null && dashboardData.unreadMessagesCount > 0 ? dashboardData.unreadMessagesCount : undefined,
+              tabBarStyle: { display: "none" },
+            }}
+          />
+          <Tab.Screen
+            name="Notification"
+            component={AdminNotifications}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <NotificationIcon
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+              tabBarBadge: dashboardData != null && dashboardData.unreadNotificationsCount > 0 ? dashboardData.unreadNotificationsCount : undefined, // show a number badge
+            }}
+          />
+          <Tab.Screen
+            name="Logout"
+            component={LogoutScreen}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <LogoutIcon
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+            }}
+          /></>
+      ) :
+        <>
+          <Tab.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <HomeIconBtm
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Gallery"
+            component={GalleryScreen}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <GalleryIcon
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Chat"
+            component={Chat}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <ChatIconBtm
+                  stroke={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+              tabBarBadge: dashboardData != null && dashboardData.unreadMessagesCount > 0 ? dashboardData.unreadMessagesCount : undefined,
+              tabBarStyle: { display: "none" },
+            }}
+          />
+          <Tab.Screen
+            name="Notification"
+            component={Notification}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <NotificationIcon
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+              tabBarBadge: dashboardData != null && dashboardData.unreadNotificationsCount > 0 ? dashboardData.unreadNotificationsCount : undefined, // show a number badge
+            }}
+          />
+
+          {userType && <Tab.Screen
+            name="Profile"
+            component={userType == 3 ? ProfileOptions : userType == 4 ? AdminProfileOptions : ProfileOptions}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <ProfileIconBtm
+                  fill={focused ? appColors.primaryColor : appColors.black}
+                  height={24}
+                  width={24}
+                />
+              ),
+            }}
+          />
+          }</>
+      }
     </Tab.Navigator>
   );
 };

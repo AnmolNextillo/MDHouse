@@ -61,7 +61,7 @@ const ParentDetails = ({ navigation, route }) => {
   /* ================= UPDATE PROFILE ================= */
 
   const updateParentDetails = async () => {
-    if (!fatherName || !fatherEmail || !motherName || !motherEmail) {
+    if (!fatherName || !fatherEmail || !motherName || !motherEmail || !fatherPhoneNumber || !fatherWappNumber || !motherPhoneNumber || !motherWappNumber) {
       Alert.alert("MD House", "All fields are required");
       return;
     }

@@ -24,7 +24,7 @@ const OTP_LENGTH = 4;
 const RESEND_TIME = 30;
 
 const OtpScreen = ({ navigation, route }) => {
-    const { id, userType } = route.params || {};
+    const { id } = route.params || {};
 
     const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(""));
     const [timer, setTimer] = useState(RESEND_TIME);
@@ -107,8 +107,12 @@ const OtpScreen = ({ navigation, route }) => {
 
     // ✅ Save token and navigate
     const saveToken = async (loginData) => {
+           const userType = await AsyncStorage.getItem("userType");
+            console.log("userType saved:", userType);
         await AsyncStorage.setItem("token", loginData.token);
+    
         if (userType == 3) {
+            await AsyncStorage.setItem("agentType", JSON.stringify(loginData.data.agentType));
             navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
         }
         else {
@@ -148,8 +152,10 @@ const OtpScreen = ({ navigation, route }) => {
     }
 
     useEffect(() => {
+        console.log("OTP Response:", responseOtp);
         if (responseOtp != null) {
             if (responseOtp.status === 1) saveToken(responseOtp);
+            else Alert.alert("MD House", responseOtp.message || "OTP verification failed. Please try again.");
         }
     }, [responseOtp]);
 

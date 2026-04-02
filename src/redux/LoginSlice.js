@@ -1,7 +1,7 @@
 // src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ApiBaseUrl, login, loginV2, partnerLogin } from "../utils/constants";
+import { adminLogin, ApiBaseUrl, login, loginV2, partnerLogin } from "../utils/constants";
 
 export const hitLogin = createAsyncThunk("hitLogin", async (payload) => {
   try {
@@ -11,7 +11,7 @@ export const hitLogin = createAsyncThunk("hitLogin", async (payload) => {
       },
     };
     console.log("Payload ===> ", payload)
-    const url = ApiBaseUrl + (payload.studentType === "partner" ? partnerLogin : loginV2);
+    const url = ApiBaseUrl + (payload.studentType === "partner" ? partnerLogin : payload.studentType === "admin" ? adminLogin : loginV2);
     console.log("url ===> ", url)
     const response = await axios.post(url, payload, config);
     console.log("Response ===> ", response.data)

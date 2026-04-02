@@ -44,6 +44,16 @@ export const sendMessageToAdmin  = "v1/agent/sendMessageToAdmin";
 export const getStudentDetails  = "v1/agent/getStudentDetails";
 export const agentOtp  = "v2/agent/otpVerification";
 export const agentResendOtp  = "v2/agent/resendOtp";
+export const printStudentRecord  = "v1/agent/printStudentRecord";
+
+// Admin APIs
+export const adminLogin  = "v1/admin/login";
+export const adminAgents  = "v1/admin/agents";
+export const adminAgentDetails  = "v1/admin/agentDetails";
+export const adminAddAgent = "v1/admin/addAgent";
+export const adminUpdateAgent = "v1/admin/agents";
+export const adminDeleteAgent = "v1/admin/agents";
+export const getStudents = "v1/admin/studentList";
 
 
 export async function requestAllPermissions() {

@@ -50,6 +50,16 @@ import StudentList from "./src/screens/Partner/StudentList/index.js";
 import AddStudent from "./src/screens/Partner/AddStudent/index.js";
 import StudentDetails from "./src/screens/Partner/StudentDetails/index.js";
 import OtpScreen from "./src/screens/OtpScreen/index.js";
+import AdminLogin from "./src/screens/Admin/AdminLogin/index.js";
+import AdminProfileOptions from "./src/screens/Admin/AdminProfileOption/index.js";
+import AdminHome from "./src/screens/Admin/AdminHome/index.js";
+import LogoutScreen from "./src/screens/Admin/LogoutScreen/index.js";
+import AdminChat from "./src/screens/Admin/AdminChat/index.js";
+import AdminAgents from "./src/screens/Admin/AdminAgents/index.js";
+import AdminAddAgent from "./src/screens/Admin/AdminAddAgent/index.js";
+import AdminAgentDetails from "./src/screens/Admin/AdminAgentDetails/index.js";
+import AdminStudents from "./src/screens/Admin/AdminStudents/index.js";
+import AdminStudentDetails from "./src/screens/Admin/AdminStudentDetails/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -121,7 +131,7 @@ const App = () => {
         const studentType = await AsyncStorage.getItem("userType");
         console.log("Token found:", token, "Step ===> ", step, "Type ===> ", studentType);
         if (token) {
-          if (studentType == 3) {
+          if (studentType == 3 || studentType == 4) {
             const screen = "BottomBar";
             setInitialRoute(screen);
             return;
@@ -407,6 +417,19 @@ const App = () => {
               <Stack.Screen name="AddStudent" component={AddStudent} />
               <Stack.Screen name="StudentDetails" component={StudentDetails} />
               <Stack.Screen name="OtpScreen" component={OtpScreen} />
+
+              {/* Admin Screens */}
+              <Stack.Screen name="AdminLogin" component={AdminLogin} />
+              <Stack.Screen name="AdminProfileOptions" component={AdminProfileOptions} />
+              <Stack.Screen name="AdminHome" component={AdminHome} />
+              <Stack.Screen name="LogoutScreen" component={LogoutScreen} />
+              <Stack.Screen name="AdminChat" component={AdminChat} />
+              <Stack.Screen name="AdminAgents" component={AdminAgents} />
+              <Stack.Screen name="AdminAddAgent" component={AdminAddAgent} />
+              <Stack.Screen name="AdminAgentDetails" component={AdminAgentDetails} />
+              <Stack.Screen name="AdminStudents" component={AdminStudents} />
+              <Stack.Screen name="AdminStudentDetails" component={AdminStudentDetails} />
+
             </Stack.Navigator>
           </View>
         </NavigationContainer>

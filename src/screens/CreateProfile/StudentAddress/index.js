@@ -85,15 +85,12 @@ const StudentAddress = ({ navigation, route }) => {
       city,
       state,
       pinCode,
-
       studyAddress: landmarkF,
       studyCity: cityF,
       studyState: stateF,
       studyPinCode: pinCodeF,
-
       studyMobileNumber: phoneNumberF,
       studyWhatsAppMobileNumber: phoneNumberW,
-
       studyMobileCountryCode: phoneCountryCodeF,
       studyWhatsAppCountryCode: phoneCountryCodeW,
 

@@ -14,10 +14,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { hitAgentStudentList } from "../../../redux/AgentStudentListSlice";
 import { useIsFocused } from "@react-navigation/native";
 
-const StudentList = ({ navigation }) => {
+const StudentList = ({ navigation,route }) => {
   //   const students = [
   //     { id: "1", name: "John Doe", mobile: "9876543210" },
   //   ]; // replace with API data
+
+  const { agentType } = route.params;
 
   const isFocused = useIsFocused();
 
@@ -44,7 +46,7 @@ const StudentList = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate("StudentDetails", { student: item })}
+      onPress={() => navigation.navigate("StudentDetails", { student: item,agentType: agentType })}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image
@@ -55,6 +57,7 @@ const StudentList = ({ navigation }) => {
         />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.name}>Student Id: {item.studentId}</Text>
           <Text style={styles.mobile}>Mobile No. : +91 {item.mobileNumber}</Text>
           <Text style={styles.mobile}>Email : {item.email}</Text>
         </View>
@@ -81,12 +84,14 @@ const StudentList = ({ navigation }) => {
       />
 
       {/* FAB BUTTON */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate("AddStudent")}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+     {agentType == 1 && (
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigation.navigate("AddStudent")}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };

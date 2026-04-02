@@ -58,6 +58,7 @@ const AddStudent = ({ navigation, route }) => {
     aadhaarFront: "",
     aadhaarBack: "",
     neet: "",
+    policeVerification: "",
     ratios: {},
   });
 
@@ -94,6 +95,7 @@ const AddStudent = ({ navigation, route }) => {
         aadhaarFront: student.aadhaarImageFront || "",
         aadhaarBack: student.aadhaarImageBack || "",
         neet: student.neetImage || "",
+        policeVerification: student.studyPoliceVerificationImageBack || "",
         ratios: {},
       });
     }
@@ -220,6 +222,7 @@ const AddStudent = ({ navigation, route }) => {
       plusTwoImage: images.marksheet,
       passportImageBack: images.passportBack,
       passportImageFront: images.passportFront,
+      policeVerificationImageBack: images.policeVerification,
       neetImage: images.neet,
     };
 

@@ -34,7 +34,7 @@ import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
 import { hitUpdateProfile } from "../../../redux/AgentUpdateProfileSlice";
 
 
-const ProfileOptions = ({ navigation }) => {
+const AdminProfileOptions = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -347,7 +347,7 @@ const ProfileOptions = ({ navigation }) => {
                 Logout
               </Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity
+            <TouchableOpacity
               style={styles.deleteAccountStyle}
               onPress={() => onDeleteAccountClick()}
             >
@@ -361,7 +361,7 @@ const ProfileOptions = ({ navigation }) => {
               >
                 Delete Account
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
         </ScrollView>
       ) : (
@@ -381,7 +381,7 @@ const ProfileOptions = ({ navigation }) => {
   );
 };
 
-export default ProfileOptions;
+export default AdminProfileOptions;
 
 const styles = StyleSheet.create({
   constainerStyle: {

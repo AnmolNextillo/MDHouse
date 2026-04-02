@@ -91,7 +91,7 @@ const StudentDetials = ({ navigation, route }) => {
   }, [isFocused]);
 
   const addStudentDetails = async () => {
-    if (!name) {
+    if (!name || !bloodGroup || bloodGroup === "Select Blood Group" || !passportNumber || !phoneNumber) {
       Alert.alert("MD House", "All fields are required");
       return;
     }

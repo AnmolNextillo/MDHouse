@@ -32,7 +32,14 @@ import updateStudentReducer from './UpdateStudentSlice';
 import studentDetailsReducer from './GetStudentDetailsSlice';
 import otpApiReducer from './OtpApiSlice';
 import resendOtpApiReducer from './AgentResendOtpSlice';
- 
+import printStudentRecordReducer from './PrintStudentRecordSlice';
+import getAgentDetailsReducer from './admin_apis/AdminAgentDetailSlice';
+import adminAddAgentReducer from './admin_apis/AdminAddAgentSlice';
+import adminUpdateAgentReducer from './admin_apis/AdminUpdateAgentSlice';
+import adminDeleteAgentReducer from './admin_apis/AdminDeleteAgentSlice';
+import adminGetStudentsReducer from './admin_apis/AdminGetStudentsSlice';
+import adminGetStudentDetailsReducer from './admin_apis/AdminStudentDetailSlice';
+
 const store = configureStore({ 
   reducer: {
    signupReducer:signupReducer,
@@ -68,6 +75,13 @@ const store = configureStore({
    studentDetailsReducer:studentDetailsReducer,
    otpApiReducer:otpApiReducer,
    resendOtpApiReducer:resendOtpApiReducer,
+   printStudentRecordReducer:printStudentRecordReducer,
+   getAgentDetailsReducer:getAgentDetailsReducer,
+   adminAddAgentReducer:adminAddAgentReducer,
+   adminUpdateAgentReducer:adminUpdateAgentReducer,
+   adminDeleteAgentReducer:adminDeleteAgentReducer,
+   adminGetStudentsReducer:adminGetStudentsReducer,
+   adminGetStudentDetailsReducer:adminGetStudentDetailsReducer,
   },
 });
 
