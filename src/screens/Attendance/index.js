@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  FlatList,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { appColors } from "../../utils/color";
@@ -14,8 +13,9 @@ import BackIcon from "../../assets/svgs/BackIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { hitAttendance } from "../../redux/AttendanceSlice";
 
-const Attendance = () => {
+const Attendance = ({ route }) => {
   const navigation = useNavigation();
+  const studentId = route?.params?.studentId;
 
   const [selectedSemester, setSelectedSemester] = useState("1");
 
@@ -26,8 +26,8 @@ const Attendance = () => {
   const dispatch = useDispatch()
 
     useEffect(() => {
-      dispatch(hitAttendance(selectedSemester));
-    }, [selectedSemester]);
+      dispatch(hitAttendance({ semester: selectedSemester, studentId }));
+    }, [selectedSemester, studentId]);
 
   // Dummy attendance data (you can replace with API data later)
   const dummyAttendance = [

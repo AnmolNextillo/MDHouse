@@ -60,6 +60,20 @@ import AdminAddAgent from "./src/screens/Admin/AdminAddAgent/index.js";
 import AdminAgentDetails from "./src/screens/Admin/AdminAgentDetails/index.js";
 import AdminStudents from "./src/screens/Admin/AdminStudents/index.js";
 import AdminStudentDetails from "./src/screens/Admin/AdminStudentDetails/index.js";
+import AdminNewStudents from "./src/screens/Admin/AdminNewStudents/index.js";
+import AdminNewStudentDetails from "./src/screens/Admin/AdminNewStudentDetails/index.js";
+import AdminStudentResult from "./src/screens/Admin/AdminStudentResult/index.js";
+import AdminStudentAttendance from "./src/screens/Admin/AdminStudentAttendance/index.js";
+import AdminUniversities from "./src/screens/Admin/AdminUniversities/index.js";
+import AdminAddUniversity from "./src/screens/Admin/AdminAddUniversity/index.js";
+import AdminUniversityDetails from "./src/screens/Admin/AdminUniversityDetails/index.js";
+import AdminCourses from "./src/screens/Admin/AdminCourses/index.js";
+import AdminAddCourse from "./src/screens/Admin/AdminAddCourse/index.js";
+import AdminCourseDetails from "./src/screens/Admin/AdminCourseDetails/index.js";
+import AdminAnnouncements from "./src/screens/Admin/AdminAnnouncements/index.js";
+import AdminAddAnnouncement from "./src/screens/Admin/AdminAddAnnouncement/index.js";
+import AdminAnnouncementDetails from "./src/screens/Admin/AdminAnnouncementDetails/index.js";
+import AdminSettings from "./src/screens/Admin/AdminSettings/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -429,6 +443,20 @@ const App = () => {
               <Stack.Screen name="AdminAgentDetails" component={AdminAgentDetails} />
               <Stack.Screen name="AdminStudents" component={AdminStudents} />
               <Stack.Screen name="AdminStudentDetails" component={AdminStudentDetails} />
+              <Stack.Screen name="AdminStudentResult" component={AdminStudentResult} />
+              <Stack.Screen name="AdminStudentAttendance" component={AdminStudentAttendance} />
+              <Stack.Screen name="AdminNewStudents" component={AdminNewStudents} />
+              <Stack.Screen name="AdminNewStudentDetails" component={AdminNewStudentDetails} />
+              <Stack.Screen name="AdminUniversities" component={AdminUniversities} />
+              <Stack.Screen name="AdminAddUniversity" component={AdminAddUniversity} />
+              <Stack.Screen name="AdminUniversityDetails" component={AdminUniversityDetails} />
+              <Stack.Screen name="AdminCourses" component={AdminCourses} />
+              <Stack.Screen name="AdminAddCourse" component={AdminAddCourse} />
+              <Stack.Screen name="AdminCourseDetails" component={AdminCourseDetails} />
+              <Stack.Screen name="AdminAnnouncements" component={AdminAnnouncements} />
+              <Stack.Screen name="AdminAddAnnouncement" component={AdminAddAnnouncement} />
+              <Stack.Screen name="AdminAnnouncementDetails" component={AdminAnnouncementDetails} />
+              <Stack.Screen name="AdminSettings" component={AdminSettings} />
 
             </Stack.Navigator>
           </View>

@@ -54,6 +54,31 @@ export const adminAddAgent = "v1/admin/addAgent";
 export const adminUpdateAgent = "v1/admin/agents";
 export const adminDeleteAgent = "v1/admin/agents";
 export const getStudents = "v1/admin/studentList";
+export const adminGetStudentResult = "v1/admin/getStudentResult";
+export const adminAddStudentResult = "v1/admin/addStudentResult";
+export const adminUpdateStudentResult = "v1/admin/updateStudentResult";
+export const adminAddStudentAttendance = "v1/admin/addStudentAttendance";
+// Universities APIs
+export const adminUniversities = "v1/admin/universitiesList";
+export const adminAddUniversity = "v1/admin/addUniversity";
+export const adminUpdateUniversity = "v1/admin/updateUniversity";
+export const adminDeleteUniversity = "v1/admin/universities";
+
+// Courses APIs
+export const adminCourses = "v1/admin/courseList";
+export const adminAddCourse = "v1/admin/addCourse";
+export const adminUpdateCourse = "v1/admin/updateCourse";
+export const adminDeleteCourse = "v1/admin/courses";
+
+// Announcements APIs
+export const adminAnnouncements = "v1/admin/announcements";
+export const adminAddAnnouncement = "v1/admin/addAnnouncement";
+export const adminUpdateAnnouncement = "v1/admin/announcements";
+export const adminDeleteAnnouncement = "v1/admin/announcements";
+
+// Settings APIs
+export const getSettings = "v1/admin/getSettings";
+export const updateSettings = "v1/admin/updateSettings";
 
 
 export async function requestAllPermissions() {

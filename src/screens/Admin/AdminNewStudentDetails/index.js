@@ -10,6 +10,7 @@ import {
   Linking,
   ActivityIndicator,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BackIcon from "../../../assets/svgs/BackIcon";
@@ -22,10 +23,14 @@ import {
   hitPrintStudentRecord,
   clearPrintStudentRecord,
 } from "../../../redux/PrintStudentRecordSlice";
+import {
+  hitUpdateStudent,
+  clearUpdateStudent,
+} from "../../../redux/UpdateStudentSlice";
 
 const { width, height } = Dimensions.get("window");
 
-const AdminStudentDetails = ({ navigation, route }) => {
+const AdminNewStudentDetails = ({ navigation, route }) => {
   const studentParam = route.params?.student;
   const [studentData, setStudentData] = useState(studentParam || null);
   const [ratios, setRatios] = useState({});
@@ -38,6 +43,9 @@ const AdminStudentDetails = ({ navigation, route }) => {
   const { isLoading: isPrinting, data: printData } = useSelector(
     (state) => state.printStudentRecordReducer
   );
+  const { isLoading: isUpdating, data: updateData } = useSelector(
+    (state) => state.updateStudentReducer
+  );
 
   useEffect(() => {
     // Use the student param data directly, same as list logic
@@ -47,6 +55,7 @@ const AdminStudentDetails = ({ navigation, route }) => {
     return () => {
       dispatch(clearGetStudentDetails());
       dispatch(clearPrintStudentRecord());
+      dispatch(clearUpdateStudent());
     };
   }, [dispatch, studentParam]);
 
@@ -66,6 +75,14 @@ const AdminStudentDetails = ({ navigation, route }) => {
     }
   }, [printData, dispatch]);
 
+  useEffect(() => {
+    if (updateData && updateData.status == 1) {
+      Alert.alert("Success", "Student sent to university agent successfully");
+      dispatch(clearUpdateStudent());
+      // Optionally navigate back or refresh
+    }
+  }, [updateData, dispatch]);
+
   const handlePrint = () => {
     const studentId = studentData?._id || studentData?.studentId;
     if (studentId) {
@@ -73,12 +90,14 @@ const AdminStudentDetails = ({ navigation, route }) => {
     }
   };
 
-  const handleUpdateResult = () => {
-    navigation.navigate("AdminStudentResult", { student: studentData });
-  };
-
-  const handleUpdateAttendance = () => {
-    navigation.navigate("AdminStudentAttendance", { student: studentData });
+  const handleSendToUniversityAgent = () => {
+    const studentId = studentData?._id || studentData?.studentId;
+    if (studentId) {
+      dispatch(hitUpdateStudent({
+        studentId,
+        isSentToUniversityForAdmissionLetter: 1
+      }));
+    }
   };
 
   /* ================= HELPERS ================= */
@@ -143,7 +162,7 @@ const AdminStudentDetails = ({ navigation, route }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon height={28} width={28} fill={appColors.white} />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Student Details</Text>
+        <Text style={styles.headerText}>New Student Details</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -195,6 +214,10 @@ const AdminStudentDetails = ({ navigation, route }) => {
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Mobile:</Text>
                 <Text style={styles.infoValue}>{studentData?.mobileNumber || "N/A"}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Agent ID:</Text>
+                <Text style={styles.infoValue}>{studentData?.agentId || "N/A"}</Text>
               </View>
               {studentData?.university && (
                 <View style={styles.infoRow}>
@@ -262,25 +285,14 @@ const AdminStudentDetails = ({ navigation, route }) => {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.actionSummaryCard}>
-              <Text style={styles.actionSummaryTitle}>Academic Update Actions</Text>
-              <Text style={styles.actionSummaryText}>
-                Use the buttons below to update the student result and attendance records.
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={handleSendToUniversityAgent}
+              disabled={isUpdating}
+            >
+              <Text style={styles.sendButtonText}>
+                {isUpdating ? "Sending..." : "Send To University Agent"}
               </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={handleUpdateResult}
-            >
-              <Text style={styles.updateButtonText}>Update Result</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.attendanceButton}
-              onPress={handleUpdateAttendance}
-            >
-              <Text style={styles.attendanceButtonText}>Update Attendance</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -293,7 +305,7 @@ const AdminStudentDetails = ({ navigation, route }) => {
   );
 };
 
-export default AdminStudentDetails;
+export default AdminNewStudentDetails;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: appColors.white },
@@ -330,24 +342,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: appColors.white,
   },
-  actionSummaryCard: {
-    backgroundColor: "#f1f6ff",
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
-    borderWidth: 1,
-    borderColor: "#d6e2ff",
-  },
-  actionSummaryTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 6,
-    color: appColors.primaryColor,
-  },
-  actionSummaryText: {
-    color: appColors.grey,
-    lineHeight: 20,
-  },
   name: {
     fontSize: 18,
     fontWeight: "bold",
@@ -375,7 +369,7 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontWeight: "600",
     color: appColors.black,
-    width: 80,
+    width: 100,
   },
   infoValue: {
     flex: 1,
@@ -420,33 +414,20 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: "center",
   },
-  updateButton: {
-    backgroundColor: "#2E86DE",
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 12,
-    alignItems: "center",
-  },
-  updateButtonText: {
+  printButtonText: {
     color: appColors.white,
     textAlign: "center",
     fontWeight: "600",
     fontSize: 16,
   },
-  attendanceButton: {
+  sendButton: {
     backgroundColor: "#28a745",
     padding: 16,
     borderRadius: 16,
-    marginTop: 12,
+    marginTop: 16,
     alignItems: "center",
   },
-  attendanceButtonText: {
-    color: appColors.white,
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  printButtonText: {
+  sendButtonText: {
     color: appColors.white,
     textAlign: "center",
     fontWeight: "600",

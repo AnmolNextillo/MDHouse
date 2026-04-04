@@ -13,8 +13,13 @@ export const hitAttendance = createAsyncThunk("hitAttendance", async (payload) =
         Authorization:token
       },
     };
-    const url = ApiBaseUrl + getAttendance+"?semester="+payload;
-    console.log("URL ====> ",url,"  Payload ===>",payload)
+    const payloadData = typeof payload === "object" ? payload : { semester: payload };
+    const queryParts = [`semester=${payloadData.semester}`];
+    if (payloadData.studentId) {
+      queryParts.push(`studentId=${payloadData.studentId}`);
+    }
+    const url = ApiBaseUrl + getAttendance + "?" + queryParts.join("&");
+    console.log("URL ====> ",url,"  Payload ===>",payloadData)
     const response = await axios.get(url,config);
     console.log("Response Get getAttendance===> ",response.data);
     return response.data;

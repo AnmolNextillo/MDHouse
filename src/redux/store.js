@@ -39,6 +39,23 @@ import adminUpdateAgentReducer from './admin_apis/AdminUpdateAgentSlice';
 import adminDeleteAgentReducer from './admin_apis/AdminDeleteAgentSlice';
 import adminGetStudentsReducer from './admin_apis/AdminGetStudentsSlice';
 import adminGetStudentDetailsReducer from './admin_apis/AdminStudentDetailSlice';
+import adminGetStudentResultReducer from './admin_apis/AdminGetStudentResultSlice';
+import adminAddStudentResultReducer from './admin_apis/AdminAddStudentResultSlice';
+import adminAddStudentAttendanceReducer from './admin_apis/AdminAddStudentAttendanceSlice';
+import getUniversitiesReducer from './admin_apis/GetUniversitiesSlice';
+import adminAddUniversityReducer from './admin_apis/AdminAddUniversitySlice';
+import adminUpdateUniversityReducer from './admin_apis/AdminUpdateUniversitySlice';
+import adminDeleteUniversityReducer from './admin_apis/AdminDeleteUniversitySlice';
+import getCoursesReducer from './admin_apis/GetCoursesSlice';
+import adminAddCourseReducer from './admin_apis/AdminAddCourseSlice';
+import adminUpdateCourseReducer from './admin_apis/AdminUpdateCourseSlice';
+import adminDeleteCourseReducer from './admin_apis/AdminDeleteCourseSlice';
+import getAnnouncementsReducer from './admin_apis/GetAnnouncementsSlice';
+import adminAddAnnouncementReducer from './admin_apis/AdminAddAnnouncementSlice';
+import adminUpdateAnnouncementReducer from './admin_apis/AdminUpdateAnnouncementSlice';
+import adminDeleteAnnouncementReducer from './admin_apis/AdminDeleteAnnouncementSlice';
+import getSettingsReducer from './admin_apis/GetSettingsSlice';
+import updateSettingsReducer from './admin_apis/UpdateSettingsSlice';
 
 const store = configureStore({ 
   reducer: {
@@ -82,6 +99,23 @@ const store = configureStore({
    adminDeleteAgentReducer:adminDeleteAgentReducer,
    adminGetStudentsReducer:adminGetStudentsReducer,
    adminGetStudentDetailsReducer:adminGetStudentDetailsReducer,
+   adminGetStudentResultReducer:adminGetStudentResultReducer,
+   adminAddStudentResultReducer:adminAddStudentResultReducer,
+   adminAddStudentAttendanceReducer:adminAddStudentAttendanceReducer,
+   getUniversitiesReducer:getUniversitiesReducer,
+   adminAddUniversityReducer:adminAddUniversityReducer,
+   adminUpdateUniversityReducer:adminUpdateUniversityReducer,
+   adminDeleteUniversityReducer:adminDeleteUniversityReducer,
+   getCoursesReducer:getCoursesReducer,
+   adminAddCourseReducer:adminAddCourseReducer,
+   adminUpdateCourseReducer:adminUpdateCourseReducer,
+   adminDeleteCourseReducer:adminDeleteCourseReducer,
+   getAnnouncementsReducer:getAnnouncementsReducer,
+   adminAddAnnouncementReducer:adminAddAnnouncementReducer,
+   adminUpdateAnnouncementReducer:adminUpdateAnnouncementReducer,
+   adminDeleteAnnouncementReducer:adminDeleteAnnouncementReducer,
+   getSettingsReducer:getSettingsReducer,
+   updateSettingsReducer:updateSettingsReducer,
   },
 });
 
