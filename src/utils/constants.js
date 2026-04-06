@@ -76,6 +76,11 @@ export const adminAddAnnouncement = "v1/admin/addAnnouncement";
 export const adminUpdateAnnouncement = "v1/admin/announcements";
 export const adminDeleteAnnouncement = "v1/admin/announcements";
 
+// Banners APIs
+export const adminBanners = "v1/admin/bannersList";
+export const adminAddBanner = "v1/admin/addBanner";
+export const adminUpdateBanner = "v1/admin/updateBanner";
+
 // Settings APIs
 export const getSettings = "v1/admin/getSettings";
 export const updateSettings = "v1/admin/updateSettings";

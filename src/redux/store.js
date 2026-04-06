@@ -54,6 +54,9 @@ import getAnnouncementsReducer from './admin_apis/GetAnnouncementsSlice';
 import adminAddAnnouncementReducer from './admin_apis/AdminAddAnnouncementSlice';
 import adminUpdateAnnouncementReducer from './admin_apis/AdminUpdateAnnouncementSlice';
 import adminDeleteAnnouncementReducer from './admin_apis/AdminDeleteAnnouncementSlice';
+import getBannersReducer from './admin_apis/GetBannersSlice';
+import adminAddBannerReducer from './admin_apis/AdminAddBannerSlice';
+import adminUpdateBannerReducer from './admin_apis/AdminUpdateBannerSlice';
 import getSettingsReducer from './admin_apis/GetSettingsSlice';
 import updateSettingsReducer from './admin_apis/UpdateSettingsSlice';
 
@@ -114,6 +117,9 @@ const store = configureStore({
    adminAddAnnouncementReducer:adminAddAnnouncementReducer,
    adminUpdateAnnouncementReducer:adminUpdateAnnouncementReducer,
    adminDeleteAnnouncementReducer:adminDeleteAnnouncementReducer,
+   getBannersReducer:getBannersReducer,
+   adminAddBannerReducer:adminAddBannerReducer,
+   adminUpdateBannerReducer:adminUpdateBannerReducer,
    getSettingsReducer:getSettingsReducer,
    updateSettingsReducer:updateSettingsReducer,
   },
