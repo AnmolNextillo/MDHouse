@@ -81,6 +81,11 @@ export const adminBanners = "v1/admin/bannersList";
 export const adminAddBanner = "v1/admin/addBanner";
 export const adminUpdateBanner = "v1/admin/updateBanner";
 
+// Gallery APIs
+export const adminGallery = "v1/admin/galleryList";
+export const adminAddGallery = "v1/admin/addGallery";
+export const adminUpdateGallery = "v1/admin/updateGallery";
+
 // Settings APIs
 export const getSettings = "v1/admin/getSettings";
 export const updateSettings = "v1/admin/updateSettings";

@@ -75,6 +75,8 @@ import AdminAddAnnouncement from "./src/screens/Admin/AdminAddAnnouncement/index
 import AdminAnnouncementDetails from "./src/screens/Admin/AdminAnnouncementDetails/index.js";
 import AdminBanners from "./src/screens/Admin/AdminBanners/index.js";
 import AdminAddBanner from "./src/screens/Admin/AdminAddBanner/index.js";
+import AdminGallery from "./src/screens/Admin/AdminGallery/index.js";
+import AdminAddGallery from "./src/screens/Admin/AdminAddGallery/index.js";
 import AdminSettings from "./src/screens/Admin/AdminSettings/index.js";
 
 const Stack = createNativeStackNavigator();
@@ -460,6 +462,8 @@ const App = () => {
               <Stack.Screen name="AdminAnnouncementDetails" component={AdminAnnouncementDetails} />
               <Stack.Screen name="AdminBanners" component={AdminBanners} />
               <Stack.Screen name="AdminAddBanner" component={AdminAddBanner} />
+              <Stack.Screen name="AdminGallery" component={AdminGallery} />
+              <Stack.Screen name="AdminAddGallery" component={AdminAddGallery} />
               <Stack.Screen name="AdminSettings" component={AdminSettings} />
 
             </Stack.Navigator>
