@@ -172,6 +172,13 @@ const AdminUniversities = ({ navigation }) => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          ListEmptyComponent={
+            !loading ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No records found</Text>
+              </View>
+            ) : null
+          }
           ListFooterComponent={
             loadingMore ? (
               <ActivityIndicator
@@ -299,5 +306,18 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: "#fff",
     fontWeight: "700",
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+
+  emptyText: {
+    fontSize: 18,
+    color: appColors.grey,
+    textAlign: "center",
   },
 });

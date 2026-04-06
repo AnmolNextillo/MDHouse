@@ -181,6 +181,13 @@ const AdminStudents = ({ navigation }) => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          ListEmptyComponent={
+            !loading ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No records found</Text>
+              </View>
+            ) : null
+          }
           ListFooterComponent={
             loadingMore ? (
               <ActivityIndicator
@@ -291,6 +298,19 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 14,
     color: appColors.grey,
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+
+  emptyText: {
+    fontSize: 18,
+    color: appColors.grey,
+    textAlign: "center",
   },
 });
 
