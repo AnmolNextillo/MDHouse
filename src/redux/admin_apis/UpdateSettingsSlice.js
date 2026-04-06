@@ -5,16 +5,17 @@ import { updateSettings, ApiBaseUrl } from "../../utils/constants";
 
 export const hitUpdateSettings = createAsyncThunk(
   "hitUpdateSettings",
-  async ({ totalMedicalStudentGuided, totalPartnerUniversities, totalSuccessfulDoctors }) => {
+  async ({ totalMedicalStudentGuided, totalPartnerUniversities, totalSuccessfullDoctors, totalSuccessfulDoctors }) => {
     try {
       const token = await AsyncStorage.getItem("token");
 
       const url = ApiBaseUrl + updateSettings;
 
+      const doctorsCount = totalSuccessfullDoctors ?? totalSuccessfulDoctors;
       const payload = {
         totalMedicalStudentGuided: parseInt(totalMedicalStudentGuided),
         totalPartnerUniversities: parseInt(totalPartnerUniversities),
-        totalSuccessfulDoctors: parseInt(totalSuccessfulDoctors),
+        totalSuccessfullDoctors: parseInt(doctorsCount),
       };
 
       const config = {

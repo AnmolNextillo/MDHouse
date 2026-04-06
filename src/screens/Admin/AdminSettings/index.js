@@ -56,14 +56,14 @@ const AdminSettings = ({ navigation }) => {
 
   const handleUpdate = async () => {
     // Validation
-    if (!totalMedicalStudentGuided.trim() || !totalPartnerUniversities.trim() || !totalSuccessfullDoctors.trim()) {
+    if (!totalMedicalStudentGuided.trim() || !totalPartnerUniversities.trim() || !totalSuccessfulDoctors.trim()) {
       Alert.alert("Validation error", "Please fill all fields.");
       return;
     }
 
     const guidedNum = parseInt(totalMedicalStudentGuided);
     const universitiesNum = parseInt(totalPartnerUniversities);
-    const doctorsNum = parseInt(totalSuccessfullDoctors);
+    const doctorsNum = parseInt(totalSuccessfulDoctors);
 
     if (isNaN(guidedNum) || guidedNum < 0) {
       Alert.alert("Validation error", "Total Medical Student Guided must be a valid non-negative number.");

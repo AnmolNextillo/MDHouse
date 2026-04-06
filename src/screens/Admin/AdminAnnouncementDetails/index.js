@@ -38,7 +38,7 @@ const AdminAnnouncementDetails = ({ navigation, route }) => {
     }
 
     const payload = {
-      id,
+      announcementId: id,
       title: title.trim(),
       description: description.trim(),
     };

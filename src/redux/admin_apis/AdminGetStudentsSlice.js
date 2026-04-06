@@ -5,7 +5,7 @@ import { getStudents, ApiBaseUrl } from "../../utils/constants";
 
 export const hitGetStudents = createAsyncThunk(
   "hitGetStudents",
-  async ({ start = 0, length = 10, search = "" } = {}) => {
+  async ({ start = 0, length = 10, search = "", type= "" } = {}) => {
     try {
       const token = await AsyncStorage.getItem("token");
 
@@ -15,6 +15,7 @@ export const hitGetStudents = createAsyncThunk(
         start,
         length,
         search,
+        type
       };
 
       const config = {

@@ -5,14 +5,14 @@ import { adminUpdateAnnouncement, ApiBaseUrl } from "../../utils/constants";
 
 export const hitAdminUpdateAnnouncement = createAsyncThunk(
   "hitAdminUpdateAnnouncement",
-  async ({ id, title, description }) => {
+  async ({ announcementId, title, description }) => {
     try {
       const token = await AsyncStorage.getItem("token");
 
       const url = ApiBaseUrl + adminUpdateAnnouncement;
 
       const payload = {
-        id,
+        announcementId,
         title,
         description,
       };

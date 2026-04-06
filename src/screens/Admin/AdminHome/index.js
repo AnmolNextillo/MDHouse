@@ -11,20 +11,16 @@ import LinearGradient from "react-native-linear-gradient";
 import { appColors } from "../../../utils/color";
 
 const menuItems = [
-  { id: "1", title: "Agents",screen:"AdminAgents" },
-  { id: "2", title: "Students",screen:"AdminStudents" },
-  { id: "3", title: "Alumni Students",screen:"AdminAlumni" },
-  { id: "4", title: "New Students",screen:"AdminNewStudents" },
-  { id: "5", title: "Announcements",screen:"AdminAnnouncements" },
-  { id: "6", title: "Leaves",screen:"AdminLeaves" },
-  { id: "7", title: "Send Notifications",screen:"AdminNotifications" },
-  { id: "8", title: "Gallery",screen:"AdminGallery" },
-  { id: "9", title: "Banners",screen:"AdminBanners" },
-  { id: "10", title: "Universities",screen:"AdminUniversities" },
-  { id: "11", title: "Courses",screen:"AdminCourses" },
-  { id: "12", title: "Settings",screen:"AdminSettings" },
-  { id: "13", title: "Sub Admin",screen:"AdminSubAdmin" },
-
+  { id: "1", title: "Agents", screen: "AdminAgents" },
+  { id: "2", title: "Students", screen: "AdminStudents" },
+  { id: "3", title: "Alumni Students", screen: "AdminAlumni" },
+  { id: "4", title: "New Students", screen: "AdminNewStudents" },
+  { id: "5", title: "Announcements", screen: "AdminAnnouncements" },
+  { id: "6", title: "Gallery", screen: "AdminGallery" },
+  { id: "7", title: "Banners", screen: "AdminBanners" },
+  { id: "8", title: "Universities", screen: "AdminUniversities" },
+  { id: "9", title: "Courses", screen: "AdminCourses" },
+  { id: "10", title: "Settings", screen: "AdminSettings" },
 ];
 
 const AdminHome = ({ navigation }) => {

@@ -27,6 +27,7 @@ const { width, height } = Dimensions.get("window");
 
 const AdminStudentDetails = ({ navigation, route }) => {
   const studentParam = route.params?.student;
+  const printOnly = route.params?.printOnly || false;
   const [studentData, setStudentData] = useState(studentParam || null);
   const [ratios, setRatios] = useState({});
   const [loadingFiles, setLoadingFiles] = useState({});
@@ -262,26 +263,30 @@ const AdminStudentDetails = ({ navigation, route }) => {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.actionSummaryCard}>
-              <Text style={styles.actionSummaryTitle}>Academic Update Actions</Text>
-              <Text style={styles.actionSummaryText}>
-                Use the buttons below to update the student result and attendance records.
-              </Text>
-            </View>
+            {!printOnly && (
+              <>
+                <View style={styles.actionSummaryCard}>
+                  <Text style={styles.actionSummaryTitle}>Academic Update Actions</Text>
+                  <Text style={styles.actionSummaryText}>
+                    Use the buttons below to update the student result and attendance records.
+                  </Text>
+                </View>
 
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={handleUpdateResult}
-            >
-              <Text style={styles.updateButtonText}>Update Result</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.updateButton}
+                  onPress={handleUpdateResult}
+                >
+                  <Text style={styles.updateButtonText}>Update Result</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.attendanceButton}
-              onPress={handleUpdateAttendance}
-            >
-              <Text style={styles.attendanceButtonText}>Update Attendance</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.attendanceButton}
+                  onPress={handleUpdateAttendance}
+                >
+                  <Text style={styles.attendanceButtonText}>Update Attendance</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </>
         ) : (
           <View style={styles.errorContainer}>

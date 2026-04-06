@@ -71,9 +71,9 @@ export const adminUpdateCourse = "v1/admin/updateCourse";
 export const adminDeleteCourse = "v1/admin/courses";
 
 // Announcements APIs
-export const adminAnnouncements = "v1/admin/announcements";
+export const adminAnnouncements = "v1/admin/announcementList";
 export const adminAddAnnouncement = "v1/admin/addAnnouncement";
-export const adminUpdateAnnouncement = "v1/admin/announcements";
+export const adminUpdateAnnouncement = "v1/admin/updateAnnouncement";
 export const adminDeleteAnnouncement = "v1/admin/announcements";
 
 // Banners APIs
