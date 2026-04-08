@@ -21,6 +21,7 @@ import {
 } from "../../../redux/admin_apis/AdminAgentDetailSlice";
 import { hitAdminUpdateAgent, clearAdminUpdateAgent } from "../../../redux/admin_apis/AdminUpdateAgentSlice";
 import { hitAdminDeleteAgent, clearAdminDeleteAgent } from "../../../redux/admin_apis/AdminDeleteAgentSlice";
+import { hitSendNotificationSingle } from "../../../redux/GetNotificationsSlice";
 
 const AdminAgentDetails = ({ navigation, route }) => {
   const agentParam = route.params?.agent;
@@ -28,6 +29,9 @@ const AdminAgentDetails = ({ navigation, route }) => {
   const [name, setName] = useState(agentParam?.name || "");
   const [email, setEmail] = useState(agentParam?.email || "");
   const [password, setPassword] = useState(agentParam?.password || "");
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationDescription, setNotificationDescription] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [mobileNumber, setMobileNumber] = useState(agentParam?.mobileNumber || "");
 
@@ -37,6 +41,7 @@ const AdminAgentDetails = ({ navigation, route }) => {
   );
   const { isLoading: isUpdating } = useSelector((state) => state.adminUpdateAgentReducer);
   const { isLoading: isDeleting } = useSelector((state) => state.adminDeleteAgentReducer);
+  const { isSendingSingle } = useSelector((state) => state.getNotificationsReducer);
 
   useEffect(() => {
     if (!agentParam) {
@@ -122,6 +127,34 @@ const AdminAgentDetails = ({ navigation, route }) => {
     );
   };
 
+  const handleSendNotification = async () => {
+    if (!id) {
+      Alert.alert("Notification", "Agent ID is not available to send notification.");
+      return;
+    }
+    if (!notificationTitle.trim() || !notificationDescription.trim()) {
+      Alert.alert("Validation", "Please enter both title and description.");
+      return;
+    }
+
+    const payload = {
+      agentId: id,
+      title: notificationTitle.trim(),
+      description: notificationDescription.trim(),
+    };
+
+    const resultAction = await dispatch(hitSendNotificationSingle(payload));
+    if (hitSendNotificationSingle.fulfilled.match(resultAction)) {
+      Alert.alert("Success", "Notification sent successfully.");
+      setNotificationTitle("");
+      setNotificationDescription("");
+      setShowNotificationForm(false);
+    } else {
+      const errorMessage = resultAction.payload?.message || resultAction.error?.message || "Unable to send notification.";
+      Alert.alert("Error", errorMessage);
+    }
+  };
+
   const loading = isDetailsLoading || isUpdating || isDeleting;
 
   return (
@@ -195,6 +228,33 @@ const AdminAgentDetails = ({ navigation, route }) => {
             <TouchableOpacity style={styles.deleteButton} onPress={handleDelete} disabled={isDeleting}>
               <Text style={styles.deleteText}>{isDeleting ? "Deleting..." : "Delete Agent"}</Text>
             </TouchableOpacity>
+            <View style={styles.notificationCard}>
+              <Text style={styles.sectionTitle}>Send Notification</Text>
+              <TextInput
+                style={styles.notificationInput}
+                value={notificationTitle}
+                onChangeText={setNotificationTitle}
+                placeholder="Title"
+                placeholderTextColor="#999"
+              />
+              <TextInput
+                style={[styles.notificationInput, { height: 100, textAlignVertical: 'top' }]}
+                value={notificationDescription}
+                onChangeText={setNotificationDescription}
+                placeholder="Description"
+                placeholderTextColor="#999"
+                multiline
+              />
+              <TouchableOpacity
+                style={[styles.sendButton, { marginTop: 8 }]}
+                onPress={handleSendNotification}
+                disabled={isSendingSingle}
+              >
+                <Text style={styles.sendButtonText}>
+                  {isSendingSingle ? "Sending..." : "Send Notification"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </>
         )}
       </ScrollView>
@@ -223,4 +283,34 @@ const styles = StyleSheet.create({
   updateText: { color: "#fff", fontWeight: "700" },
   deleteButton: { backgroundColor: appColors.red, padding: 14, borderRadius: 8, alignItems: "center" },
   deleteText: { color: "#fff", fontWeight: "700" },
+  notificationCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  notificationInput: {
+    backgroundColor: "#F7F9FC",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    color: appColors.black,
+  },
+  sendButton: {
+    backgroundColor: appColors.primaryColor,
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  sendButtonText: {
+    color: appColors.white,
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+  },
 });

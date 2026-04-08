@@ -7,7 +7,7 @@ import {
   TextInput,
   Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackIcon from "../../assets/svgs/BackIcon";
 import DownIcon from "../../assets/svgs/DownIcon";
@@ -17,6 +17,7 @@ import { appColors } from "../../utils/color";
 import { hitGetUni } from "../../redux/GetUniSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getCountries, getCountryCallingCode } from "libphonenumber-js";
+import { hitSendNotificationSingle } from "../../redux/GetNotificationsSlice";
 import countries from "../../assets/countries.json";
 import {
   clearUpdateProfile,
@@ -25,10 +26,12 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import CountryCodeModal from "../../components/CountryCodeModal";
 
-const AlumniDetails = ({ navigation,routes }) => {
+const AlumniDetails = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
-  const {from} = routes.params || {};
+  console.log("AlumniDetails Screen Rendered with params:", route.params);
+  const {from} = route.params || {};
+  const scrollViewRef = useRef(null);
   const countriesCode = getCountries();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleCountry, setModalVisibleCountry] = useState(false);
@@ -50,6 +53,9 @@ const AlumniDetails = ({ navigation,routes }) => {
 
   const [workingAt, setWorkingAt] = useState("");
   const [universities, setUniversities] = useState([]);
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationDescription, setNotificationDescription] = useState("");
 
   const responseProfileData = useSelector(
     (state) => state.getProfileReducer.data,
@@ -60,6 +66,7 @@ const AlumniDetails = ({ navigation,routes }) => {
   const responseUpdateProfile = useSelector(
     (state) => state.updateProfileReducer.data,
   );
+  const { isSendingSingle } = useSelector((state) => state.getNotificationsReducer);
 
   /* ================= PROFILE DATA ================= */
 
@@ -166,6 +173,36 @@ const AlumniDetails = ({ navigation,routes }) => {
     dispatch(hitUpdateProfile(payload));
   };
 
+  const handleSendNotification = async () => {
+    const studentId = responseProfileData?.data?._id || responseProfileData?.data?.studentId || route.params?.studentId;
+
+    if (!studentId) {
+      Alert.alert("Notification", "Student ID is not available to send notification.");
+      return;
+    }
+    if (!notificationTitle.trim() || !notificationDescription.trim()) {
+      Alert.alert("Validation", "Please enter both title and description.");
+      return;
+    }
+
+    const payload = {
+      studentId,
+      title: notificationTitle.trim(),
+      description: notificationDescription.trim(),
+    };
+
+    const resultAction = await dispatch(hitSendNotificationSingle(payload));
+    if (hitSendNotificationSingle.fulfilled.match(resultAction)) {
+      Alert.alert("Success", "Notification sent successfully.");
+      setNotificationTitle("");
+      setNotificationDescription("");
+      setShowNotificationForm(false);
+    } else {
+      const errorMessage = resultAction.payload?.message || resultAction.error?.message || "Unable to send notification.";
+      Alert.alert("Error", errorMessage);
+    }
+  };
+
   const years = Array.from({ length: 30 }, (_, i) => ({
     id: 2025 - i,
     name: `${2025 - i}`,
@@ -182,6 +219,7 @@ const AlumniDetails = ({ navigation,routes }) => {
       </View>}
 
       <KeyboardAwareScrollView
+        ref={scrollViewRef}
         contentContainerStyle={{ paddingBottom: 120 }}
         enableOnAndroid
         keyboardShouldPersistTaps="handled"
@@ -312,6 +350,51 @@ const AlumniDetails = ({ navigation,routes }) => {
             onChangeText={setWorkingAt}
             placeholder="Company / Hospital Name"
           />
+
+          {showNotificationForm ? (
+            <View style={styles.notificationCard}>
+              <Text style={styles.sectionTitle}>Send Notification</Text>
+              <TextInput
+                style={styles.notificationInput}
+                value={notificationTitle}
+                onChangeText={setNotificationTitle}
+                placeholder="Title"
+                placeholderTextColor="#999"
+              />
+              <TextInput
+                style={[styles.notificationInput, { height: 100, textAlignVertical: 'top' }]}
+                value={notificationDescription}
+                onChangeText={setNotificationDescription}
+                placeholder="Description"
+                placeholderTextColor="#999"
+                multiline
+              />
+              <View style={styles.notificationActionRow}>
+                <TouchableOpacity
+                  style={[styles.sendButton, { flex: 1, marginRight: 8 }]}
+                  onPress={handleSendNotification}
+                  disabled={isSendingSingle}
+                >
+                  <Text style={styles.sendButtonText}>
+                    {isSendingSingle ? "Sending..." : "Send Notification"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => setShowNotificationForm(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.sendButton, { marginTop: 16 }]}
+              onPress={() => setShowNotificationForm(true)}
+            >
+              <Text style={styles.sendButtonText}>Send Notification</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.buttonContainer}>
@@ -448,6 +531,41 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: {
+    color: appColors.white,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: appColors.black,
+    marginBottom: 10,
+  },
+  notificationCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 20,
+    marginHorizontal: 0,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  notificationInput: {
+    backgroundColor: "#F7F9FC",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    color: appColors.black,
+  },
+  sendButton: {
+    backgroundColor: appColors.primaryColor,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  sendButtonText: {
     color: appColors.white,
     fontSize: 16,
     fontWeight: "600",

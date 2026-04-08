@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  TextInput,
   TouchableOpacity,
   Linking,
   ActivityIndicator,
@@ -27,6 +28,7 @@ import {
   hitUpdateStudent,
   clearUpdateStudent,
 } from "../../../redux/UpdateStudentSlice";
+import { hitSendNotificationSingle } from "../../../redux/GetNotificationsSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,6 +37,9 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
   const [studentData, setStudentData] = useState(studentParam || null);
   const [ratios, setRatios] = useState({});
   const [loadingFiles, setLoadingFiles] = useState({});
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationDescription, setNotificationDescription] = useState("");
 
   const dispatch = useDispatch();
   const { isLoading: isDetailsLoading, data: detailsData, error } = useSelector(
@@ -46,6 +51,7 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
   const { isLoading: isUpdating, data: updateData } = useSelector(
     (state) => state.updateStudentReducer
   );
+  const { isSendingSingle } = useSelector((state) => state.getNotificationsReducer);
 
   useEffect(() => {
     // Use the student param data directly, same as list logic
@@ -97,6 +103,36 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
         studentId,
         isSentToUniversityForAdmissionLetter: 1
       }));
+    }
+  };
+
+  const handleSendNotification = async () => {
+    const studentId = studentData?._id || studentData?.studentId;
+
+    if (!studentId) {
+      Alert.alert("Notification", "Student ID is not available to send notification.");
+      return;
+    }
+    if (!notificationTitle.trim() || !notificationDescription.trim()) {
+      Alert.alert("Validation", "Please enter both title and description.");
+      return;
+    }
+
+    const payload = {
+      studentId,
+      title: notificationTitle.trim(),
+      description: notificationDescription.trim(),
+    };
+
+    const resultAction = await dispatch(hitSendNotificationSingle(payload));
+    if (hitSendNotificationSingle.fulfilled.match(resultAction)) {
+      Alert.alert("Success", "Notification sent successfully.");
+      setNotificationTitle("");
+      setNotificationDescription("");
+      setShowNotificationForm(false);
+    } else {
+      const errorMessage = resultAction.payload?.message || resultAction.error?.message || "Unable to send notification.";
+      Alert.alert("Error", errorMessage);
     }
   };
 
@@ -275,6 +311,51 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
               </View>
             )}
 
+            {showNotificationForm ? (
+              <View style={styles.notificationCard}>
+                <Text style={styles.sectionTitle}>Send Notification</Text>
+                <TextInput
+                  style={styles.notificationInput}
+                  value={notificationTitle}
+                  onChangeText={setNotificationTitle}
+                  placeholder="Title"
+                  placeholderTextColor="#999"
+                />
+                <TextInput
+                  style={[styles.notificationInput, { height: 100, textAlignVertical: 'top' }]}
+                  value={notificationDescription}
+                  onChangeText={setNotificationDescription}
+                  placeholder="Description"
+                  placeholderTextColor="#999"
+                  multiline
+                />
+                <View style={styles.notificationActionRow}>
+                  <TouchableOpacity
+                    style={[styles.sendButton, { flex: 1, marginRight: 8 }]}
+                    onPress={handleSendNotification}
+                    disabled={isSendingSingle}
+                  >
+                    <Text style={styles.sendButtonText}>
+                      {isSendingSingle ? "Sending..." : "Send Notification"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => setShowNotificationForm(false)}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[styles.sendButton, { marginTop: 16 }]}
+                onPress={() => setShowNotificationForm(true)}
+              >
+                <Text style={styles.sendButtonText}>Send Notification</Text>
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               style={styles.printButton}
               onPress={handlePrint}
@@ -432,5 +513,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "600",
     fontSize: 16,
+  },
+  notificationCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  notificationInput: {
+    backgroundColor: "#F7F9FC",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    color: appColors.black,
   },
 });

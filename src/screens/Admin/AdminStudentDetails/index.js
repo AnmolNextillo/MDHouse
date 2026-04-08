@@ -6,9 +6,11 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  TextInput,
   TouchableOpacity,
   Linking,
   ActivityIndicator,
+  Alert,
   Dimensions,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +24,7 @@ import {
   hitPrintStudentRecord,
   clearPrintStudentRecord,
 } from "../../../redux/PrintStudentRecordSlice";
+import { hitSendNotificationSingle } from "../../../redux/GetNotificationsSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,6 +34,9 @@ const AdminStudentDetails = ({ navigation, route }) => {
   const [studentData, setStudentData] = useState(studentParam || null);
   const [ratios, setRatios] = useState({});
   const [loadingFiles, setLoadingFiles] = useState({});
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationDescription, setNotificationDescription] = useState("");
 
   const dispatch = useDispatch();
   const { isLoading: isDetailsLoading, data: detailsData, error } = useSelector(
@@ -39,6 +45,7 @@ const AdminStudentDetails = ({ navigation, route }) => {
   const { isLoading: isPrinting, data: printData } = useSelector(
     (state) => state.printStudentRecordReducer
   );
+  const { isSendingSingle } = useSelector((state) => state.getNotificationsReducer);
 
   useEffect(() => {
     // Use the student param data directly, same as list logic
@@ -80,6 +87,36 @@ const AdminStudentDetails = ({ navigation, route }) => {
 
   const handleUpdateAttendance = () => {
     navigation.navigate("AdminStudentAttendance", { student: studentData });
+  };
+
+  const handleSendNotification = async () => {
+    const studentId = studentData?._id || studentData?.studentId;
+
+    if (!studentId) {
+      Alert.alert("Notification", "Student ID is not available to send notification.");
+      return;
+    }
+    if (!notificationTitle.trim() || !notificationDescription.trim()) {
+      Alert.alert("Validation", "Please enter both title and description.");
+      return;
+    }
+
+    const payload = {
+      studentId,
+      title: notificationTitle.trim(),
+      description: notificationDescription.trim(),
+    };
+
+    const resultAction = await dispatch(hitSendNotificationSingle(payload));
+    if (hitSendNotificationSingle.fulfilled.match(resultAction)) {
+      Alert.alert("Success", "Notification sent successfully.");
+      setNotificationTitle("");
+      setNotificationDescription("");
+      setShowNotificationForm(false);
+    } else {
+      const errorMessage = resultAction.payload?.message || resultAction.error?.message || "Unable to send notification.";
+      Alert.alert("Error", errorMessage);
+    }
   };
 
   /* ================= HELPERS ================= */
@@ -251,6 +288,51 @@ const AdminStudentDetails = ({ navigation, route }) => {
                   "admissionLetter"
                 )}
               </View>
+            )}
+
+            {showNotificationForm ? (
+              <View style={styles.notificationCard}>
+                <Text style={styles.sectionTitle}>Send Notification</Text>
+                <TextInput
+                  style={styles.notificationInput}
+                  value={notificationTitle}
+                  onChangeText={setNotificationTitle}
+                  placeholder="Title"
+                  placeholderTextColor="#999"
+                />
+                <TextInput
+                  style={[styles.notificationInput, { height: 100, textAlignVertical: 'top' }]}
+                  value={notificationDescription}
+                  onChangeText={setNotificationDescription}
+                  placeholder="Description"
+                  placeholderTextColor="#999"
+                  multiline
+                />
+                <View style={styles.notificationActionRow}>
+                  <TouchableOpacity
+                    style={[styles.sendButton, { flex: 1, marginRight: 8 }]}
+                    onPress={handleSendNotification}
+                    disabled={isSendingSingle}
+                  >
+                    <Text style={styles.sendButtonText}>
+                      {isSendingSingle ? "Sending..." : "Send Notification"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => setShowNotificationForm(false)}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[styles.sendButton, { marginTop: 16 }]}
+                onPress={() => setShowNotificationForm(true)}
+              >
+                <Text style={styles.sendButtonText}>Send Notification</Text>
+              </TouchableOpacity>
             )}
 
             <TouchableOpacity
@@ -452,6 +534,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   printButtonText: {
+    color: appColors.white,
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  notificationCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  notificationInput: {
+    backgroundColor: "#F7F9FC",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    color: appColors.black,
+  },
+  sendButton: {
+    backgroundColor: appColors.primaryColor,
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  sendButtonText: {
     color: appColors.white,
     textAlign: "center",
     fontWeight: "600",

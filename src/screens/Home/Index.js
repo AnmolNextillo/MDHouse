@@ -225,21 +225,21 @@ const HomeScreen = () => {
         <View style={{ flexDirection: "row", marginTop: 16, alignItems: 'center', justifyContent: 'center' }}>
           <TouchableOpacity
             style={{ marginHorizontal: 8 }}
-            onPress={() => Linking.openURL("https://facebook.com")}
+            onPress={() => Linking.openURL("https://www.facebook.com/share/18TZctn9rT/?mibextid=wwXIfr")}
           >
             <FacebookIcon height={36} width={36} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{ marginHorizontal: 8 }}
-            onPress={() => Linking.openURL("https://instagram.com")}
+            onPress={() => Linking.openURL("https://www.instagram.com/themdhouse?igsh=ZDB6ejEyc3RiZ3c5")}
           >
             <InstagramIcon height={36} width={36} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{ marginHorizontal: 8 }}
-            onPress={() => Linking.openURL("https://linkedin.com")}
+            onPress={() => Linking.openURL("https://www.linkedin.com/company/the-md-house/")}
           >
             <LinkedInIcon height={36} width={36} />
           </TouchableOpacity>

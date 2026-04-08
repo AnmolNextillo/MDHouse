@@ -1,9 +1,8 @@
-import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {StyleSheet} from "react-native";
 import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Chat from "../screens/Chat";
 import Notification from "../screens/Notification";
-import ProfileScreen from "../screens/ProfileScreen.js";
 import NotificationIcon from "../assets/svgs/NotificationIcon.js";
 import HomeScreen from "../screens/Home/Index.js";
 import HomeIconBtm from "../assets/svgs/HomeIconBtm.js";
@@ -18,7 +17,6 @@ import GalleryScreen from "../screens/GalleryScreen/index.js";
 import ProfileOptions from "../screens/Partner/ProfileOptions/index.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { hitCheckUser } from "../redux/CheckUserSlice.js";
-import AdminProfileOptions from "../screens/Admin/AdminProfileOption/index.js";
 import LogoutIcon from "../assets/svgs/LogoutIcon.js";
 import LogoutScreen from "../screens/Admin/LogoutScreen/index.js";
 import AdminHome from "../screens/Admin/AdminHome/index.js";

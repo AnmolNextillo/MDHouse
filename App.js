@@ -137,8 +137,7 @@ const App = () => {
   // }, []);
 
   // useEffect(() => {
-    Platform.OS === "ios" &&
-     useScreenSecurity();
+    useScreenSecurity();
   // }, []);
 
   useEffect(() => {

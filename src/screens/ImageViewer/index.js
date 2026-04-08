@@ -21,10 +21,12 @@ const ImageViewer = ({ route, navigation }) => {
     if (startIndex >= 0 && images && images.length > 0 && startIndex < images.length) {
       // Delay to allow FlatList to render before scrolling
       const timer = setTimeout(() => {
-        listRef.current?.scrollToIndex({
-          index: startIndex,
-          animated: false,
-        });
+        if (listRef.current && listRef.current.scrollToIndex) {
+          listRef.current.scrollToIndex({
+            index: startIndex,
+            animated: false,
+          });
+        }
       }, 100);
       return () => clearTimeout(timer);
     }
