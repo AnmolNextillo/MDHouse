@@ -18,13 +18,17 @@ const ImageViewer = ({ route, navigation }) => {
   const listRef = useRef(null);
 
   useEffect(() => {
-    if (startIndex >= 0) {
-      listRef.current?.scrollToIndex({
-        index: startIndex,
-        animated: false,
-      });
+    if (startIndex >= 0 && images && images.length > 0 && startIndex < images.length) {
+      // Delay to allow FlatList to render before scrolling
+      const timer = setTimeout(() => {
+        listRef.current?.scrollToIndex({
+          index: startIndex,
+          animated: false,
+        });
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [startIndex]);
+  }, [startIndex, images]);
 
   return (
     <View style={styles.container}>
@@ -43,29 +47,35 @@ const ImageViewer = ({ route, navigation }) => {
       </SafeAreaView>
 
       {/* Image Slider */}
-      <FlatList
-        ref={listRef}
-        data={images}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) =>
-          item?.id ? item.id.toString() : index.toString()
-        }
+      {images && images.length > 0 ? (
+        <FlatList
+          ref={listRef}
+          data={images}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) =>
+            item?.id ? item.id.toString() : index.toString()
+          }
 
-        /** 🔥 THIS LINE FIXES THE ERROR */
-        getItemLayout={(data, index) => ({
-          length: width,
-          offset: width * index,
-          index,
-        })}
+          /** 🔥 THIS LINE FIXES THE ERROR */
+          getItemLayout={(data, index) => ({
+            length: width,
+            offset: width * index,
+            index,
+          })}
 
-        renderItem={({ item }) => (
-          <View style={styles.slide}>
-            <Image source={{ uri: item?.link }} style={styles.image} />
-          </View>
-        )}
-      />
+          renderItem={({ item }) => (
+            <View style={styles.slide}>
+              <Image source={{ uri: item?.link }} style={styles.image} />
+            </View>
+          )}
+        />
+      ) : (
+        <View style={styles.slide}>
+          <Text style={{ color: "#fff", fontSize: 16 }}>No images available</Text>
+        </View>
+      )}
     </View>
   );
 };

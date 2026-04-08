@@ -69,7 +69,11 @@ const AdminChat = ({ navigation }) => {
 
   useEffect(() => {
     if (messages && messages.length > 0) {
-      flatListRef.current?.scrollToEnd({ animated: true });
+      // Delay to allow FlatList to render before scrolling
+      const timer = setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [messages]);
 

@@ -68,6 +68,7 @@ const Tabs = () => {
     }
     if (responseCheckUser != null && responseCheckUser.status == 1) {
       setUserType(responseCheckUser.data.userType);
+       console.log("User Type from API:", responseCheckUser.data.userType);
       saveUserTypeToStorage(responseCheckUser.data.userType);
     }
   }, [responseDashboard, responseCheckUser]);
@@ -213,10 +214,10 @@ const Tabs = () => {
               tabBarBadge: dashboardData != null && dashboardData.unreadNotificationsCount > 0 ? dashboardData.unreadNotificationsCount : undefined, // show a number badge
             }}
           />
-
+          {console.log("Rendering Tabs with userType:", userType)}
           {userType && <Tab.Screen
             name="Profile"
-            component={userType == 3 ? ProfileOptions : userType == 4 ? AdminProfileOptions : ProfileOptions}
+            component={userType == 3 ? ProfileOptions : ProfileOptios}
             options={{
               tabBarIcon: ({ focused }) => (
                 <ProfileIconBtm
