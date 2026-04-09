@@ -104,6 +104,12 @@ const ProfileScreen = ({ navigation }) => {
           : "https://apps.apple.com/in/app/mdhouse/id6749562016";
 
       if (currentVersion < latestVersion) {
+
+         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+          navigation.reset({
+        index: 0,
+        routes: [{ name: "UserType" }],
+      });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,

@@ -14,7 +14,6 @@ import {
 import { useEffect, useState } from "react";
 import { appColors } from "../../utils/color";
 import { useDispatch, useSelector } from "react-redux";
-import { useIsFocused } from "@react-navigation/native";
 import { hitGetProfile } from "../../redux/GetProfileSlice";
 import EditOptionModal from "../../components/EditOptionModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -33,6 +32,7 @@ import { requestAllPermissions } from "../../utils/constants";
 import ImagePicker from "react-native-image-crop-picker";
 import { clearUploadFileData, uploadFile } from "../../redux/uploadFile";
 import { hitUpdateProfile } from "../../redux/UpdateProfileSlice";
+import { useIsFocused } from "@react-navigation/native";
 
 const ProfileOptios = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -55,8 +55,10 @@ const ProfileOptios = ({ navigation }) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
 
+
   useEffect(() => {
     if (isFocused) {
+       dispatch(hitVersionApi());
       dispatch(hitGetProfile({usertype:1}));
     }
   }, [isFocused]);
@@ -103,10 +105,6 @@ const ProfileOptios = ({ navigation }) => {
   };
 
   useEffect(() => {
-    dispatch(hitVersionApi());
-  }, []);
-
-  useEffect(() => {
     console.log("responseAppVersion response ===>", responseVersion);
     if (responseVersion != null && responseVersion.status === 1) {
       checkForUpdates();
@@ -129,6 +127,12 @@ const ProfileOptios = ({ navigation }) => {
 
       console.log("latestVersion ===> ", latestVersion);
       if (currentVersion < latestVersion) {
+
+         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+          navigation.reset({
+        index: 0,
+        routes: [{ name: "UserType" }],
+      });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,

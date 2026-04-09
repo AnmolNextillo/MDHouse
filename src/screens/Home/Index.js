@@ -9,6 +9,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Linking,
+  Platform,
+  Alert,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import Swiper from "react-native-swiper";
@@ -20,10 +22,13 @@ import FacebookIcon from "../../assets/svgs/FacebookIcon";
 import InstagramIcon from "../../assets/svgs/InstagramIcon";
 import LinkedInIcon from "../../assets/svgs/LinkedInIcon";
 import YouTubeIcon from "../../assets/svgs/YouTubeIcon";
+import { hitVersionApi } from "../../redux/GetVersionSlice";
+import DeviceInfo from "react-native-device-info";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const responseHome = useSelector((state) => state.homeReducer.data);
@@ -35,8 +40,13 @@ const HomeScreen = () => {
   const [universityHeight, setUniversityHeight] = useState(0);
   const [courseHeight, setCourseHeight] = useState(0);
 
+  const responseVersion = useSelector((state) => state.getVersionReducer.data);
+
   useEffect(() => {
-    if (isFocused) dispatch(hitHome());
+    if (isFocused) {
+      dispatch(hitVersionApi());
+      dispatch(hitHome());
+    }
   }, [isFocused]);
 
   useEffect(() => {
@@ -49,6 +59,48 @@ const HomeScreen = () => {
       setCourseHeight(0);
     }
   }, [responseHome]);
+
+  useEffect(() => {
+    console.log("responseAppVersion response ===>", responseVersion);
+    if (responseVersion != null && responseVersion.status === 1) {
+      checkForUpdates();
+    }
+  }, [responseVersion]);
+
+  const checkForUpdates = async () => {
+    try {
+      const currentVersion = DeviceInfo.getVersion();
+
+      console.log("CurrentVersion ===> ", currentVersion);
+      const latestVersion =
+        Platform.OS === "android"
+          ? responseVersion.data.android
+          : responseVersion.data.ios;
+      const updateUrl =
+        Platform.OS === "android"
+          ? "https://play.google.com/store/apps/details?id=com.mdhouseapp"
+          : "https://apps.apple.com/in/app/mdhouse/id6749562016";
+
+      console.log("latestVersion ===> ", latestVersion);
+      if (currentVersion < latestVersion) {
+         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+          navigation.reset({
+        index: 0,
+        routes: [{ name: "UserType" }],
+      });
+        Alert.alert(
+          "Update Available",
+          `A new version (${latestVersion}) is available. Please update to continue.`,
+          [
+            { text: "Update Now", onPress: () => Linking.openURL(updateUrl) },
+            //  { text: "Later", style: "cancel" },
+          ].filter(Boolean)
+        );
+      }
+    } catch (error) {
+      console.log("Error checking for updates:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -185,7 +237,7 @@ const HomeScreen = () => {
           </View>
         )}
 
-                {/* ===== Stats Section ===== */}
+        {/* ===== Stats Section ===== */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{homeData?.settings?.totalMedicalStudentGuided || 0}+</Text>
@@ -345,7 +397,7 @@ const styles = StyleSheet.create({
     color: "#444",
     marginTop: 2,
   },
-   // ===== Stats Section =====
+  // ===== Stats Section =====
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",

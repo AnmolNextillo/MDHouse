@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,17 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
+  Platform,
+  Alert,
+  Linking,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { appColors } from "../../../utils/color";
+import { useDispatch, useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
+import DeviceInfo from "react-native-device-info";
+import { hitVersionApi } from "../../../redux/GetVersionSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const menuItems = [
   { id: "1", title: "Agents", screen: "AdminAgents" },
@@ -24,6 +32,63 @@ const menuItems = [
 ];
 
 const AdminHome = ({ navigation }) => {
+
+
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
+
+  const responseVersion = useSelector((state) => state.getVersionReducer.data);
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch(hitVersionApi());
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    console.log("responseAppVersion response ===>", responseVersion);
+    if (responseVersion != null && responseVersion.status === 1) {
+      checkForUpdates();
+    }
+  }, [responseVersion]);
+
+  const checkForUpdates = async () => {
+    try {
+      const currentVersion = DeviceInfo.getVersion();
+
+      console.log("CurrentVersion ===> ", currentVersion);
+      const latestVersion =
+        Platform.OS === "android"
+          ? responseVersion.data.android
+          : responseVersion.data.ios;
+      const updateUrl =
+        Platform.OS === "android"
+          ? "https://play.google.com/store/apps/details?id=com.mdhouseapp"
+          : "https://apps.apple.com/in/app/mdhouse/id6749562016";
+
+      console.log("latestVersion ===> ", latestVersion);
+      if (currentVersion < latestVersion) {
+
+        await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UserType" }],
+        });
+        Alert.alert(
+          "Update Available",
+          `A new version (${latestVersion}) is available. Please update to continue.`,
+          [
+            { text: "Update Now", onPress: () => Linking.openURL(updateUrl) },
+            //  { text: "Later", style: "cancel" },
+          ].filter(Boolean)
+        );
+      }
+    } catch (error) {
+      console.log("Error checking for updates:", error);
+    }
+  };
+
+
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
@@ -72,7 +137,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: "700",
-    padding:16,
+    padding: 16,
     color: appColors.white,
     backgroundColor: appColors.primaryColor,
     textAlign: "center",
