@@ -13,6 +13,7 @@ export const hitGetProfile = createAsyncThunk("hitGetProfile", async (payload) =
         Authorization:token
       },
     };
+    console.log("Token in Get Profile ===> ",token)
     const url = ApiBaseUrl + (payload.usertype==1?profile:partnerProfile);
     console.log("URL ====> ",url,"  Payload ===>",payload)
     if(payload.usertype==1){

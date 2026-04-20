@@ -29,6 +29,7 @@ import {
   clearUpdateStudent,
 } from "../../../redux/UpdateStudentSlice";
 import { hitSendNotificationSingle } from "../../../redux/GetNotificationsSlice";
+import { clearAdminUpdateStudent, hitAdminUpdateStudent } from "../../../redux/admin_apis/AdminUpdateStudentSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -49,7 +50,7 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
     (state) => state.printStudentRecordReducer
   );
   const { isLoading: isUpdating, data: updateData } = useSelector(
-    (state) => state.updateStudentReducer
+    (state) => state.adminUpdateStudentReducer
   );
   const { isSendingSingle } = useSelector((state) => state.getNotificationsReducer);
 
@@ -84,7 +85,7 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
   useEffect(() => {
     if (updateData && updateData.status == 1) {
       Alert.alert("Success", "Student sent to university agent successfully");
-      dispatch(clearUpdateStudent());
+      dispatch(clearAdminUpdateStudent());
       // Optionally navigate back or refresh
     }
   }, [updateData, dispatch]);
@@ -99,7 +100,7 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
   const handleSendToUniversityAgent = () => {
     const studentId = studentData?._id || studentData?.studentId;
     if (studentId) {
-      dispatch(hitUpdateStudent({
+      dispatch(hitAdminUpdateStudent({
         studentId,
         isSentToUniversityForAdmissionLetter: 1
       }));
@@ -237,7 +238,7 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
               <Text style={styles.sectionTitle}>Basic Information</Text>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Student ID:</Text>
-                <Text style={styles.infoValue}>{studentData?._id || studentData?.studentId || "N/A"}</Text>
+                <Text style={styles.infoValue}>{studentData?.studentId || studentData?._id || "N/A"}</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Name:</Text>
@@ -252,8 +253,8 @@ const AdminNewStudentDetails = ({ navigation, route }) => {
                 <Text style={styles.infoValue}>{studentData?.mobileNumber || "N/A"}</Text>
               </View>
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Agent ID:</Text>
-                <Text style={styles.infoValue}>{studentData?.agentId || "N/A"}</Text>
+                <Text style={styles.infoLabel}>Agent Name:</Text>
+                <Text style={styles.infoValue}>{studentData?.agentId.name || "N/A"}</Text>
               </View>
               {studentData?.university && (
                 <View style={styles.infoRow}>

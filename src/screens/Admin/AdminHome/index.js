@@ -68,8 +68,10 @@ const AdminHome = ({ navigation }) => {
 
       console.log("latestVersion ===> ", latestVersion);
       if (currentVersion < latestVersion) {
-
-        await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("userType");
+      await AsyncStorage.clear();
+       
         navigation.reset({
           index: 0,
           routes: [{ name: "UserType" }],

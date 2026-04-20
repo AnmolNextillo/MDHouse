@@ -20,6 +20,7 @@ import BackIcon from "../../../assets/svgs/BackIcon";
 import PlusIcon from "../../../assets/svgs/PlusIcon";
 import CrossIcon from "../../../assets/svgs/CrossIcon";
 import { hitDashboardApi } from "../../../redux/DashboardSlice";
+import { useIsFocused } from "@react-navigation/native";
 
 const AdminNotifications = ({ navigation }) => {
   const [notifications, setNotifications] = useState(null);
@@ -42,11 +43,15 @@ const AdminNotifications = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    dispatch(hitDashboardApi());
-    setIsProgress(true);
-    dispatch(hitGetAllNotifications());
-  }, []);
+    if (isFocused) {
+      dispatch(hitDashboardApi());
+      dispatch(hitGetAllNotifications());
+      setIsProgress(true);
+    }
+  }, [isFocused]);  
 
   useEffect(() => {
     if (responseSendNotification && responseSendNotification.status === 1) {
@@ -65,7 +70,7 @@ const AdminNotifications = ({ navigation }) => {
   useEffect(() => {
     if (responseNotifications && responseNotifications.status === 1) {
       setIsProgress(false);
-      setNotifications(responseNotifications.data.list);
+      setNotifications(responseNotifications.data);
     }
   }, [responseNotifications]);
 
@@ -76,7 +81,7 @@ const AdminNotifications = ({ navigation }) => {
   ];
 
   const renderNotification = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => onItemClick(item.type)}>
+    <TouchableOpacity style={styles.card} onPress={() => onItemClick(item.type, item)}>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.message}>{item.message}</Text>
@@ -111,7 +116,7 @@ const AdminNotifications = ({ navigation }) => {
     }
   };
 
-  const onItemClick = (type) => {
+  const onItemClick = (type,item) => {
     // Handle notification click, e.g., navigate to details or mark as read
     switch (type) {
       case 1:
@@ -131,6 +136,9 @@ const AdminNotifications = ({ navigation }) => {
         break;
       case 7:
          navigation.navigate("DocumentUpload", { from: 3 });
+        break;
+      case 11:
+         navigation.navigate("AdminNewStudentDetails", { student: item.studentId });
         break;
       default:
         // Handle other types or do nothing
@@ -153,7 +161,8 @@ const AdminNotifications = ({ navigation }) => {
           {showForm ? (
             <CrossIcon fill={appColors.white} width={16} height={16} />
           ) : (
-            <PlusIcon fill={appColors.white} width={16} height={16} />
+            // <PlusIcon fill={appColors.white} width={16} height={16} />
+            <Text style={styles.headerActionText}>+</Text>
           )}
         </TouchableOpacity>
       </View>

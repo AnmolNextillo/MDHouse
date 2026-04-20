@@ -236,10 +236,14 @@ const AddStudent = ({ navigation, route }) => {
   /* ================= RESPONSE ================= */
 
   useEffect(() => {
-    if (responseAddStudent?.status === 1) {
+    if (responseAddStudent && responseAddStudent?.status === 1) {
       alert("Student added successfully");
       dispatch(clearAgentAddStudent());
       navigation.goBack();
+    }
+    else if (responseAddStudent!=null && responseAddStudent?.status === 0) {
+      alert(responseAddStudent?.message || "Failed to add student");
+      dispatch(clearAgentAddStudent());
     }
   }, [responseAddStudent]);
 
@@ -377,6 +381,18 @@ const AddStudent = ({ navigation, route }) => {
           </View>
         </View>
       )}
+
+      {uploadingKey && (
+        <View style={styles.uploadOverlay}>
+          <View style={styles.uploadContainer}>
+            <ActivityIndicator size="large" color={appColors.primaryColor} />
+            <Text style={styles.uploadTitle}>Uploading...</Text>
+            <Text style={styles.uploadSubtitle}>
+              Please wait while we upload your file
+            </Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -494,5 +510,40 @@ cancelText: {
   fontSize: 16,
   fontWeight: "600",
   color: "red",
+},
+
+uploadOverlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 999,
+},
+
+uploadContainer: {
+  backgroundColor: appColors.white,
+  borderRadius: 16,
+  padding: 32,
+  alignItems: "center",
+  width: "80%",
+  maxWidth: 300,
+},
+
+uploadTitle: {
+  marginTop: 16,
+  fontSize: 20,
+  fontWeight: "700",
+  color: appColors.black,
+},
+
+uploadSubtitle: {
+  marginTop: 8,
+  fontSize: 14,
+  color: appColors.grey || "#666",
+  textAlign: "center",
 },
 });

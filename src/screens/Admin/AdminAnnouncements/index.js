@@ -14,11 +14,14 @@ import { useDispatch } from "react-redux";
 import { hitGetAnnouncements } from "../../../redux/admin_apis/GetAnnouncementsSlice";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
+import { useIsFocused } from "@react-navigation/native";
 
 const PAGE_LENGTH = 10;
 
 const AdminAnnouncements = ({ navigation }) => {
   const dispatch = useDispatch();
+
+  const isFocused = useIsFocused();
 
   const debounceRef = useRef(null);
   const onEndReachedCalledDuringMomentum = useRef(true);
@@ -33,8 +36,10 @@ const AdminAnnouncements = ({ navigation }) => {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    fetchAnnouncements(0, true);
-  }, []);
+    if (isFocused) {
+      fetchAnnouncements(0, true);
+    }
+  }, [isFocused]);
 
   const fetchAnnouncements = async (
     startValue = 0,

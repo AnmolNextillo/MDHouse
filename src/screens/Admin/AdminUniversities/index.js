@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { hitGetUniversities } from "../../../redux/admin_apis/GetUniversitiesSlice";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
+import { useIsFocused } from "@react-navigation/native";
 
 const PAGE_LENGTH = 10;
 
@@ -32,9 +33,13 @@ const AdminUniversities = ({ navigation }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    fetchUniversities(0, true);
-  }, []);
+    if (isFocused) {
+      fetchUniversities(0, true);
+    }
+  }, [isFocused]);
 
   const fetchUniversities = async (
     startValue = 0,

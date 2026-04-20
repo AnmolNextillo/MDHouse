@@ -62,6 +62,7 @@ import adminAddGalleryReducer from './admin_apis/AdminAddGallerySlice';
 import adminUpdateGalleryReducer from './admin_apis/AdminUpdateGallerySlice';
 import getSettingsReducer from './admin_apis/GetSettingsSlice';
 import updateSettingsReducer from './admin_apis/UpdateSettingsSlice';
+import adminUpdateStudentReducer from './admin_apis/AdminUpdateStudentSlice';
 
 const store = configureStore({ 
   reducer: {
@@ -128,6 +129,7 @@ const store = configureStore({
    adminUpdateGalleryReducer:adminUpdateGalleryReducer,
    getSettingsReducer:getSettingsReducer,
    updateSettingsReducer:updateSettingsReducer,
+   adminUpdateStudentReducer:adminUpdateStudentReducer,
   },
 });
 

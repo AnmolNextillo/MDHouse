@@ -18,6 +18,7 @@ import { hitGetGallery } from "../../../redux/admin_apis/GetGallerySlice";
 import { hitAdminUpdateGallery, clearAdminUpdateGallery } from "../../../redux/admin_apis/AdminUpdateGallerySlice";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
+import { useIsFocused } from "@react-navigation/native";
 
 const PAGE_LENGTH = 10;
 
@@ -36,9 +37,13 @@ const AdminGallery = ({ navigation }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    fetchGallery(0, true);
-  }, []);
+    if (isFocused) {
+      fetchGallery(0, true);
+    }
+  }, [isFocused]);
 
   const fetchGallery = async (
     startValue = 0,
@@ -123,7 +128,7 @@ const AdminGallery = ({ navigation }) => {
           style: "destructive",
           onPress: async () => {
             try {
-              const payload = { galleryId: galleryItem._id };
+              const payload = { galleryId: galleryItem._id,isDeleted:1 };
               const resultAction = await dispatch(hitAdminUpdateGallery(payload));
               if (hitAdminUpdateGallery.fulfilled.match(resultAction)) {
                 Alert.alert("Deleted", "Gallery item deleted successfully.", [

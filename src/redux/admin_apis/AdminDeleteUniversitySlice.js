@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { adminDeleteUniversity, ApiBaseUrl } from "../../utils/constants";
+import { adminDeleteUniversity, adminUpdateUniversity, ApiBaseUrl } from "../../utils/constants";
 
 export const hitAdminDeleteUniversity = createAsyncThunk(
   "hitAdminDeleteUniversity",
@@ -9,7 +9,7 @@ export const hitAdminDeleteUniversity = createAsyncThunk(
     try {
       const token = await AsyncStorage.getItem("token");
 
-      const url = ApiBaseUrl + adminDeleteUniversity;
+      const url = ApiBaseUrl + adminUpdateUniversity;
 
       const config = {
         headers: {
@@ -18,10 +18,7 @@ export const hitAdminDeleteUniversity = createAsyncThunk(
         }
       };
 
-      const response = await axios.delete(url, {
-        ...config,
-        data: payload
-      });
+      const response = await axios.put(url,payload, config);
 
       console.log("Request Payload:", payload);
       console.log("Response Delete University ===>", response.data);

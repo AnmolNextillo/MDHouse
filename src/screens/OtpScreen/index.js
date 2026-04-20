@@ -16,7 +16,7 @@ import * as Animatable from "react-native-animatable";
 import BackIcon from "../../assets/svgs/BackIcon";
 import { appColors } from "../../utils/color";
 import { useDispatch, useSelector } from "react-redux";
-import { hitOtpApi } from "../../redux/OtpApiSlice";
+import { clearOtpData, hitOtpApi } from "../../redux/OtpApiSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { hitResendOtpApi } from "../../redux/AgentResendOtpSlice";
 
@@ -114,6 +114,7 @@ const OtpScreen = ({ navigation, route }) => {
         if (userType == 3) {
             await AsyncStorage.setItem("agentType", JSON.stringify(loginData.data.agentType));
             navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
+            dispatch(clearOtpData());
         }
         else {
             await AsyncStorage.setItem("step", JSON.stringify(loginData.data.step));
@@ -146,6 +147,8 @@ const OtpScreen = ({ navigation, route }) => {
                 }
             };
         }
+
+        dispatch(clearOtpData());
 
         // const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" : loginData.data.isProfileCompleted == 1 ? "BottomBar" : "AlumniDetails";
 
@@ -216,7 +219,7 @@ const OtpScreen = ({ navigation, route }) => {
 
                             <Text style={styles.title}>Verify OTP 🔐</Text>
                             <Text style={styles.subtitle}>
-                                Enter the 6-digit OTP sent to your registered account
+                                Enter the 4-digit OTP sent to your registered account
                             </Text>
 
                             {/* OTP Inputs */}

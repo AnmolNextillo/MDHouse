@@ -17,6 +17,7 @@ import { hitGetBanners } from "../../../redux/admin_apis/GetBannersSlice";
 import { hitAdminUpdateBanner, clearAdminUpdateBanner } from "../../../redux/admin_apis/AdminUpdateBannerSlice";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
+import { useIsFocused } from "@react-navigation/native";
 
 const PAGE_LENGTH = 10;
 
@@ -35,9 +36,13 @@ const AdminBanners = ({ navigation }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    fetchBanners(0, true);
-  }, []);
+    if (isFocused) {
+      fetchBanners(0, true);
+    }
+  }, [isFocused]);
 
   const fetchBanners = async (
     startValue = 0,
@@ -122,7 +127,7 @@ const AdminBanners = ({ navigation }) => {
           style: "destructive",
           onPress: async () => {
             try {
-              const payload = { bannerId: banner._id };
+              const payload = { bannerId: banner._id,isDeleted:1 };
               const resultAction = await dispatch(hitAdminUpdateBanner(payload));
               if (hitAdminUpdateBanner.fulfilled.match(resultAction)) {
                 Alert.alert("Deleted", "Banner deleted successfully.", [

@@ -10,6 +10,9 @@ const LogoutScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
+      
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("userType");
       await AsyncStorage.clear();
 
       navigation.reset({

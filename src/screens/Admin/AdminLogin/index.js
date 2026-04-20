@@ -32,6 +32,8 @@ import BackIcon from "../../../assets/svgs/BackIcon";
 const AdminLogin = ({ navigation }) => {
   const [email, setEmail] = useState("admin@themdhouse.com");
   const [password, setPassword] = useState("TheMdHouse#2025");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
   const [userType, setUserType] = useState(""); // student | alumni
@@ -66,7 +68,7 @@ const AdminLogin = ({ navigation }) => {
     } else if (!password) {
       Alert.alert("MD House", "Please enter Password.");
     } else {
-      const payload = { email, password, fcmToken, studentType:"admin",role:"Admin" };
+      const payload = { email, password, fcmToken, studentType: "admin", role: "Admin" };
       dispatch(hitLogin(payload));
     }
   };
@@ -77,16 +79,16 @@ const AdminLogin = ({ navigation }) => {
 
     // const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" : loginData.data.isProfileCompleted == 1 ? "BottomBar" : "AlumniDetails";
 
-        navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
-     
+    navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
+
   }
 
   // ✅ Handle login response
   useEffect(() => {
-      console.log("Login Response Partner:", responseLogin);
+    console.log("Login Response Partner:", responseLogin);
     if (responseLogin) {
-      
-      if (responseLogin.status === 1){
+
+      if (responseLogin.status === 1) {
         // navigation.navigate("OtpScreen", { id:responseLogin.data._id, userType:"partner" });
         saveToken(responseLogin);
       }
@@ -123,11 +125,13 @@ const AdminLogin = ({ navigation }) => {
 
       if (currentVersion < latestVersion) {
 
-         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
-          navigation.reset({
-        index: 0,
-        routes: [{ name: "UserType" }],
-      });
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("userType");
+        await AsyncStorage.clear();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UserType" }],
+        });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,
@@ -146,14 +150,14 @@ const AdminLogin = ({ navigation }) => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackIcon height={32} width={32} fill={appColors.white} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon height={32} width={32} fill={appColors.white} />
+          </TouchableOpacity>
+        </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
@@ -252,7 +256,7 @@ export default AdminLogin;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-    header: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 14,
@@ -265,7 +269,6 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 40,
   },
   card: {
     backgroundColor: appColors.white,

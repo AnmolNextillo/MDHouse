@@ -37,6 +37,7 @@ export const hitGetAllNotifications = createAsyncThunk(
         },
       };
       const url = ApiBaseUrl + adminGetAllNotifications;
+      console.log("URL Get All Notifications ===> ", url, " Payload ===> ", payload);
       const response = await axios.post(url, payload || {}, config);
       console.log("Response Get All Notifications ===>", response.data);
       return response.data;

@@ -58,6 +58,8 @@ export const adminGetStudentResult = "v1/admin/getStudentResult";
 export const adminAddStudentResult = "v1/admin/addStudentResult";
 export const adminUpdateStudentResult = "v1/admin/updateStudentResult";
 export const adminAddStudentAttendance = "v1/admin/addStudentAttendance";
+export const adminUpdateStudent = "v1/admin/updateStudent";
+
 // Universities APIs
 export const adminUniversities = "v1/admin/universitiesList";
 export const adminAddUniversity = "v1/admin/addUniversity";
@@ -74,7 +76,7 @@ export const adminDeleteCourse = "v1/admin/courses";
 export const adminAnnouncements = "v1/admin/announcementList";
 export const adminAddAnnouncement = "v1/admin/addAnnouncement";
 export const adminUpdateAnnouncement = "v1/admin/updateAnnouncement";
-export const adminDeleteAnnouncement = "v1/admin/announcements";
+export const adminDeleteAnnouncement = "v1/admin/updateAnnouncement";
 export const adminSendNotifications = "v1/admin/sendNotifications";
 export const adminSendNotificationSingle = "v1/admin/sendNotificationSingle";
 export const adminGetAllNotifications = "v1/admin/getAllNotifications";

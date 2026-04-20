@@ -25,6 +25,8 @@ import { requestAllPermissions } from "../../../utils/constants";
 const AdminAddGallery = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   const dispatch = useDispatch();
   const { isLoading: isUploading } = useSelector((state) => state.uploadFileReducer);
@@ -121,6 +123,9 @@ const AdminAddGallery = ({ navigation }) => {
     }
 
     try {
+      setIsUploadingImages(true);
+      setUploadProgress(0);
+
       // Upload all images first
       const uploadedUrls = [];
       for (let i = 0; i < selectedImages.length; i++) {
@@ -130,16 +135,38 @@ const AdminAddGallery = ({ navigation }) => {
           type: 'image/jpeg',
         })).unwrap();
 
-        if (uploadResult?.data?.url) {
+        console.log("Upload Result:", uploadResult);
+
+        // Handle different response structures
+        let imageUrl = null;
+        if (uploadResult?.Location) {
+          imageUrl = uploadResult.Location;
+        } else if (uploadResult?.url) {
+          imageUrl = uploadResult.url;
+        } else if (uploadResult?.data?.url) {
+          imageUrl = uploadResult.data.url;
+        } else if (uploadResult?.link) {
+          imageUrl = uploadResult.link;
+        } else if (typeof uploadResult === 'string') {
+          imageUrl = uploadResult;
+        }
+
+        console.log("Extracted Image URL:", imageUrl);
+
+        if (imageUrl) {
           uploadedUrls.push({
             type: "image",
-            link: uploadResult.data.url
+            link: imageUrl
           });
         }
+
+        // Update progress
+        setUploadProgress(Math.round(((i + 1) / selectedImages.length) * 100));
       }
 
       if (uploadedUrls.length === 0) {
         Alert.alert("Error", "Failed to upload images");
+        setIsUploadingImages(false);
         return;
       }
 
@@ -157,6 +184,8 @@ const AdminAddGallery = ({ navigation }) => {
             onPress: () => {
               dispatch(clearAdminAddGallery());
               dispatch(clearUploadFileData());
+              setIsUploadingImages(false);
+              setUploadProgress(0);
               navigation.goBack();
             },
           },
@@ -164,10 +193,12 @@ const AdminAddGallery = ({ navigation }) => {
       } else {
         const apiError = resultAction.payload || resultAction.error?.message || "Something went wrong";
         Alert.alert("Error", apiError);
+        setIsUploadingImages(false);
       }
     } catch (e) {
-      console.error(e);
-      Alert.alert("Error", "Failed to add gallery item");
+      console.error("Upload Error:", e);
+      Alert.alert("Error", e?.message || "Failed to add gallery item");
+      setIsUploadingImages(false);
     }
   };
 
@@ -220,14 +251,16 @@ const AdminAddGallery = ({ navigation }) => {
               style={styles.input}
               placeholder="Enter gallery title"
               placeholderTextColor="#999"
+              editable={!isUploadingImages}
             />
           </View>
 
           <View style={styles.field}>
             <Text style={styles.label}>Images ({selectedImages.length})</Text>
             <TouchableOpacity
-              style={styles.imagePicker}
+              style={[styles.imagePicker, isUploadingImages && { opacity: 0.5 }]}
               onPress={selectImageSource}
+              disabled={isUploadingImages}
             >
               <Text style={styles.pickerText}>Tap to add images</Text>
             </TouchableOpacity>
@@ -247,12 +280,12 @@ const AdminAddGallery = ({ navigation }) => {
           <TouchableOpacity
             style={[
               styles.submitButton,
-              (isUploading || isAdding) && { opacity: 0.7 },
+              (isUploading || isAdding || isUploadingImages) && { opacity: 0.7 },
             ]}
             onPress={handleSubmit}
-            disabled={isUploading || isAdding}
+            disabled={isUploading || isAdding || isUploadingImages}
           >
-            {isUploading || isAdding ? (
+            {isUploading || isAdding || isUploadingImages ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text style={styles.submitText}>Add Gallery Item</Text>
@@ -260,6 +293,26 @@ const AdminAddGallery = ({ navigation }) => {
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {isUploadingImages && (
+        <View style={styles.uploadOverlay}>
+          <View style={styles.uploadContainer}>
+            <ActivityIndicator size="large" color={appColors.primaryColor} />
+            <Text style={styles.uploadTitle}>Uploading Images...</Text>
+            <Text style={styles.uploadProgress}>
+              {uploadProgress}% Complete
+            </Text>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${uploadProgress}%` },
+                ]}
+              />
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -364,5 +417,49 @@ const styles = StyleSheet.create({
     color: appColors.white,
     fontWeight: "700",
     fontSize: 16,
+  },
+  uploadOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  uploadContainer: {
+    backgroundColor: appColors.white,
+    borderRadius: 12,
+    padding: 24,
+    alignItems: "center",
+    width: "80%",
+    maxWidth: 300,
+  },
+  uploadTitle: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "700",
+    color: appColors.black,
+  },
+  uploadProgress: {
+    marginTop: 8,
+    fontSize: 14,
+    color: appColors.primaryColor,
+    fontWeight: "600",
+  },
+  progressBar: {
+    marginTop: 16,
+    width: "100%",
+    height: 8,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: appColors.primaryColor,
+    borderRadius: 4,
   },
 });

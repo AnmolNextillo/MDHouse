@@ -247,7 +247,7 @@ const Login = ({ navigation,routes }) => {
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 10,
   },
    header: {
     flexDirection: "row",

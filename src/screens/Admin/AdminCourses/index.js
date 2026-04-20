@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { hitGetCourses } from "../../../redux/admin_apis/GetCoursesSlice";
 import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
+import { useIsFocused } from "@react-navigation/native";
 
 const PAGE_LENGTH = 10;
 
@@ -32,9 +33,12 @@ const AdminCourses = ({ navigation }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const isFocused = useIsFocused();
   useEffect(() => {
-    fetchCourses(0, true);
-  }, []);
+    if (isFocused) {
+      fetchCourses(0, true);
+    }
+  }, [isFocused]);
 
   const fetchCourses = async (
     startValue = 0,

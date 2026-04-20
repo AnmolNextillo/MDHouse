@@ -57,11 +57,11 @@ const AdminUniversityDetails = ({ navigation, route }) => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            const payload = { id: universityId };
+            const payload = { universityId: universityId,isDeleted:1 };
             const resultAction = await dispatch(hitAdminDeleteUniversity(payload));
             if (hitAdminDeleteUniversity.fulfilled.match(resultAction)) {
               Alert.alert("Deleted", "University deleted successfully.", [
-                { text: "OK", onPress: () => navigation.navigate("AdminUniversities") },
+                { text: "OK", onPress: () => navigation.goBack() },
               ]);
             } else {
               const err = resultAction.payload || resultAction.error?.message || "Delete failed";

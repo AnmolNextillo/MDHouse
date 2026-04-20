@@ -83,11 +83,13 @@ const HomeScreen = ({ navigation }) => {
 
       console.log("latestVersion ===> ", latestVersion);
       if (currentVersion < latestVersion) {
-         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
-          navigation.reset({
-        index: 0,
-        routes: [{ name: "UserType" }],
-      });
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("userType");
+        await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UserType" }],
+        });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,

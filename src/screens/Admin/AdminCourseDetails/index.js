@@ -57,11 +57,11 @@ const AdminCourseDetails = ({ navigation, route }) => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            const payload = { id };
-            const resultAction = await dispatch(hitAdminDeleteCourse(payload));
-            if (hitAdminDeleteCourse.fulfilled.match(resultAction)) {
+            const payload = { courseId: id, isDeleted: 1 };
+            const resultAction = await dispatch(hitAdminUpdateCourse(payload));
+            if (hitAdminUpdateCourse.fulfilled.match(resultAction)) {
               Alert.alert("Deleted", "Course deleted successfully.", [
-                { text: "OK", onPress: () => navigation.navigate("AdminCourses") },
+                { text: "OK", onPress: () => navigation.goBack() },
               ]);
             } else {
               const err = resultAction.payload || resultAction.error?.message || "Delete failed";

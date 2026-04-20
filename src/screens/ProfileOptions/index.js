@@ -58,8 +58,8 @@ const ProfileOptios = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-       dispatch(hitVersionApi());
-      dispatch(hitGetProfile({usertype:1}));
+      dispatch(hitVersionApi());
+      dispatch(hitGetProfile({ usertype: 1 }));
     }
   }, [isFocused]);
 
@@ -128,11 +128,13 @@ const ProfileOptios = ({ navigation }) => {
       console.log("latestVersion ===> ", latestVersion);
       if (currentVersion < latestVersion) {
 
-         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
-          navigation.reset({
-        index: 0,
-        routes: [{ name: "UserType" }],
-      });
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("userType");
+        await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UserType" }],
+        });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,
@@ -235,7 +237,7 @@ const ProfileOptios = ({ navigation }) => {
 
   useEffect(() => {
 
-    if (profileData!= null && profileData.studentType == 2 && responseUploadImage != null) {
+    if (profileData != null && profileData.studentType == 2 && responseUploadImage != null) {
       setProfileImage(responseUploadImage.Location);
       setImageModalVisible(false);
 

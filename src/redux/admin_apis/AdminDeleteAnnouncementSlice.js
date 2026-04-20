@@ -12,7 +12,8 @@ export const hitAdminDeleteAnnouncement = createAsyncThunk(
       const url = ApiBaseUrl + adminDeleteAnnouncement;
 
       const payload = {
-        id,
+        announcementId:id,
+        isDeleted: 1,
       };
 
       const config = {
@@ -22,7 +23,7 @@ export const hitAdminDeleteAnnouncement = createAsyncThunk(
         }
       };
 
-      const response = await axios.delete(url, { data: payload, ...config });
+      const response = await axios.put(url,  payload, config );
 
       console.log("Request URL:", url);
       console.log("Request Payload:", payload);

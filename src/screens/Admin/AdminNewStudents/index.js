@@ -60,7 +60,7 @@ const AdminNewStudents = ({ navigation }) => {
       const list = result?.data || [];
 
       // Filter students who have agentIds
-      const filteredList = list.filter(student => student.agentId && student.agentId.trim() !== "");
+      const filteredList = list.filter(student => student.agentId && student.agentId.name.trim() !== "");
 
       if (reset) {
         setStudents(filteredList);
@@ -134,10 +134,10 @@ const AdminNewStudents = ({ navigation }) => {
 
       <View style={{ flex: 1 }}>
         <Text style={styles.name}>{item?.name}</Text>
-        <Text style={styles.studentId}>ID: {item?._id || item?.studentId}</Text>
+        <Text style={styles.studentId}>ID: {item?.studentId || item?._id}</Text>
         <Text style={styles.info}>📧 {item?.email}</Text>
         <Text style={styles.info}>📞 {item?.mobileNumber}</Text>
-        <Text style={styles.info}>Agent ID: {item?.agentId}</Text>
+        <Text style={styles.info}>Agent Name: {item?.agentId.name}</Text>
       </View>
     </TouchableOpacity>
   );

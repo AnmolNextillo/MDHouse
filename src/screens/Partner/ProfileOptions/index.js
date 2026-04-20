@@ -64,7 +64,7 @@ const ProfileOptions = ({ navigation }) => {
     }
     if (isFocused) {
       fetchAgentTyep();
-      dispatch(hitGetProfile({usertype:3}));
+      dispatch(hitGetProfile({ usertype: 3 }));
     }
   }, [isFocused]);
 
@@ -87,13 +87,13 @@ const ProfileOptions = ({ navigation }) => {
 
   const onItemClick = (value) => {
     setModalVisible(false);
-    navigation.navigate(value, { from: 2,agentType:agentType });
+    navigation.navigate(value, { from: 2, agentType: agentType });
   };
 
   const onLogoutClick = async () => {
     console.log("Logout clicked");
     await AsyncStorage.removeItem("token");
- 
+
     // Add small delay so navigation happens after mount
     // setTimeout(() => {
     //   navigation.reset({
@@ -137,11 +137,13 @@ const ProfileOptions = ({ navigation }) => {
       console.log("latestVersion ===> ", latestVersion);
       if (currentVersion < latestVersion) {
 
-         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
-          navigation.reset({
-        index: 0,
-        routes: [{ name: "UserType" }],
-      });
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("userType");
+        await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UserType" }],
+        });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,
@@ -252,8 +254,8 @@ const ProfileOptions = ({ navigation }) => {
         profileImage: responseUploadImage.Location,
 
       };
-      if(isFocused){
-      dispatch(hitUpdateProfile(payload));
+      if (isFocused) {
+        dispatch(hitUpdateProfile(payload));
       }
     }
 
@@ -305,9 +307,9 @@ const ProfileOptions = ({ navigation }) => {
                     style={styles.profileImage}
                   />
                 </TouchableOpacity>
-                  {agentType == 1 && <TouchableOpacity onPress={() => openModal()} style={{ marginLeft: -20, marginTop: 40 }}>
-                    <EditIcon height={24} width={24} fill={appColors.black} />
-                  </TouchableOpacity>}
+                {agentType == 1 && <TouchableOpacity onPress={() => openModal()} style={{ marginLeft: -20, marginTop: 40 }}>
+                  <EditIcon height={24} width={24} fill={appColors.black} />
+                </TouchableOpacity>}
                 <View style={{ flex: 1, paddingHorizontal: 16 }}>
                   <Text style={styles.userNameStyle}>{profileData.name}</Text>
                   <Text style={styles.simpleTextStyle}>
@@ -321,22 +323,22 @@ const ProfileOptions = ({ navigation }) => {
               </View>
             </View>
             <View>
-                {agentType==1 && <TouchableOpacity
-                  style={styles.itemStyle}
-                  onPress={() => onItemClick("UpdateProfile")}
-                >
-                  <Text style={styles.lableStyle}>Update Profile</Text>
-                  <RightArrow height={24} width={24} />
-                </TouchableOpacity>}
+              {agentType == 1 && <TouchableOpacity
+                style={styles.itemStyle}
+                onPress={() => onItemClick("UpdateProfile")}
+              >
+                <Text style={styles.lableStyle}>Update Profile</Text>
+                <RightArrow height={24} width={24} />
+              </TouchableOpacity>}
 
-                <TouchableOpacity
-                  style={styles.itemStyle}
-                  onPress={() => onItemClick("StudentList")}
-                >
-                  <Text style={styles.lableStyle}>Student List</Text>
-                  <RightArrow height={24} width={24} />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={styles.itemStyle}
+                onPress={() => onItemClick("StudentList")}
+              >
+                <Text style={styles.lableStyle}>Student List</Text>
+                <RightArrow height={24} width={24} />
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
               style={styles.logoutButtonStyle}

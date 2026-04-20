@@ -112,10 +112,20 @@ const AdminAddBanner = ({ navigation }) => {
         type: 'image/jpeg',
       })).unwrap();
 
-      if (uploadResult?.data?.url) {
+      console.log("Upload Result:", uploadResult);
+
+      const imageUrl =
+        uploadResult?.Location ||
+        uploadResult?.location ||
+        uploadResult?.data?.url ||
+        uploadResult?.url ||
+        uploadResult?.link ||
+        null;
+
+      if (imageUrl) {
         // Now add the banner with the uploaded image URL
         const payload = {
-          image: uploadResult.data.url,
+          image: imageUrl,
         };
 
         const resultAction = await dispatch(hitAdminAddBanner(payload));

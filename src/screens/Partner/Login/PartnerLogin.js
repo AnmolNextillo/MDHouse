@@ -66,7 +66,7 @@ const PartnerLogin = ({ navigation }) => {
     } else if (!password) {
       Alert.alert("MD House", "Please enter Password.");
     } else {
-      const payload = { email, password, fcmToken, studentType:"partner" };
+      const payload = { email, password, fcmToken, studentType: "partner" };
       dispatch(hitLogin(payload));
     }
   };
@@ -77,17 +77,17 @@ const PartnerLogin = ({ navigation }) => {
 
     // const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" : loginData.data.isProfileCompleted == 1 ? "BottomBar" : "AlumniDetails";
 
-        navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
-     
+    navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
+
   }
 
   // ✅ Handle login response
   useEffect(() => {
-      console.log("Login Response Partner:", responseLogin);
+    console.log("Login Response Partner:", responseLogin);
     if (responseLogin) {
-      
-      if (responseLogin.status === 1){
-        navigation.navigate("OtpScreen", { id:responseLogin.data._id, userType:"partner" });
+
+      if (responseLogin.status === 1) {
+        navigation.navigate("OtpScreen", { id: responseLogin.data._id, userType: "partner" });
       }
       else Alert.alert("MD House", responseLogin.message);
       dispatch(clearLoginData());
@@ -122,11 +122,13 @@ const PartnerLogin = ({ navigation }) => {
 
       if (currentVersion < latestVersion) {
 
-         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
-          navigation.reset({
-        index: 0,
-        routes: [{ name: "UserType" }],
-      });
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("userType");
+        await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UserType" }],
+        });
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,
@@ -145,14 +147,14 @@ const PartnerLogin = ({ navigation }) => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackIcon height={32} width={32} fill={appColors.white} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon height={32} width={32} fill={appColors.white} />
+          </TouchableOpacity>
+        </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
@@ -251,7 +253,7 @@ export default PartnerLogin;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-    header: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 14,
@@ -264,7 +266,6 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 40,
   },
   card: {
     backgroundColor: appColors.white,
