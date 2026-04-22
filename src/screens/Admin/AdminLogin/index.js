@@ -30,10 +30,10 @@ import { getImage } from "../../../utils/getImages";
 import BackIcon from "../../../assets/svgs/BackIcon";
 
 const AdminLogin = ({ navigation }) => {
-  const [email, setEmail] = useState("admin@themdhouse.com");
-  const [password, setPassword] = useState("TheMdHouse#2025");
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("admin@themdhouse.com");
+  // const [password, setPassword] = useState("TheMdHouse#2025");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
   const [userType, setUserType] = useState(""); // student | alumni
