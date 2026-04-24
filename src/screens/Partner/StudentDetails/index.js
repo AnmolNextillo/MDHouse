@@ -18,15 +18,18 @@ import { hitStudentDetials } from "../../../redux/GetStudentDetailsSlice";
 import { useIsFocused } from "@react-navigation/native";
 import Pdf from "react-native-pdf";
 import ImagePicker from "react-native-image-crop-picker";
-import DocumentPicker from "react-native-document-picker";
+import { pick } from "@react-native-documents/picker";
 import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
 import { hitUpdateStudent } from "../../../redux/UpdateStudentSlice";
-import { clearPrintStudentRecord, hitPrintStudentRecord } from "../../../redux/PrintStudentRecordSlice";
+import {
+  clearPrintStudentRecord,
+  hitPrintStudentRecord,
+} from "../../../redux/PrintStudentRecordSlice";
 
 const { width, height } = Dimensions.get("window");
 
 const StudentDetails = ({ navigation, route }) => {
-  const {student, agentType } = route.params || {};
+  const { student, agentType } = route.params || {};
 
   const [ratios, setRatios] = useState({});
   const [studentData, setStudentData] = useState(null);
@@ -35,20 +38,19 @@ const StudentDetails = ({ navigation, route }) => {
 
   const dispatch = useDispatch();
   const studentResponse = useSelector(
-    (state) => state.studentDetailsReducer.data
+    (state) => state.studentDetailsReducer.data,
   );
 
-    const responseUpdateStudent = useSelector(
-      (state) => state.updateStudentReducer.data
-    );
+  const responseUpdateStudent = useSelector(
+    (state) => state.updateStudentReducer.data,
+  );
 
-    const responseUploadImage = useSelector(
-      (state) => state.uploadFileReducer.data
-    );
-    const responsePrintStudentRecord = useSelector(
-      (state) => state.printStudentRecordReducer.data
-    );
-  
+  const responseUploadImage = useSelector(
+    (state) => state.uploadFileReducer.data,
+  );
+  const responsePrintStudentRecord = useSelector(
+    (state) => state.printStudentRecordReducer.data,
+  );
 
   const isFocused = useIsFocused();
 
@@ -57,7 +59,7 @@ const StudentDetails = ({ navigation, route }) => {
     if (isFocused) {
       dispatch(hitStudentDetials({ studentId: student._id }));
     }
-  }, [isFocused,responseUpdateStudent]);
+  }, [isFocused, responseUpdateStudent]);
 
   useEffect(() => {
     if (studentResponse && studentResponse.status === 1) {
@@ -76,14 +78,13 @@ const StudentDetails = ({ navigation, route }) => {
         const ratio = width / height;
         setRatios((prev) => ({ ...prev, [key]: ratio }));
       },
-      () => { }
+      () => {},
     );
   };
 
   /* ================= FILE RENDER ================= */
 
   const renderFile = (label, uri, key) => {
-
     if (!uri) return null;
 
     const ratio = ratios[key] || 1;
@@ -95,10 +96,7 @@ const StudentDetails = ({ navigation, route }) => {
         {isPdf(uri) ? (
           <View style={styles.pdfContainer}>
             {loadingFiles[key] && (
-              <ActivityIndicator
-                size="small"
-                color={appColors.primaryColor}
-              />
+              <ActivityIndicator size="small" color={appColors.primaryColor} />
             )}
 
             <Pdf
@@ -110,9 +108,7 @@ const StudentDetails = ({ navigation, route }) => {
               onLoadComplete={() =>
                 setLoadingFiles((p) => ({ ...p, [key]: false }))
               }
-              onError={() =>
-                setLoadingFiles((p) => ({ ...p, [key]: false }))
-              }
+              onError={() => setLoadingFiles((p) => ({ ...p, [key]: false }))}
             />
 
             <TouchableOpacity
@@ -142,7 +138,7 @@ const StudentDetails = ({ navigation, route }) => {
     });
   };
 
-    const handleOptionSelect = async (type, key) => {
+  const handleOptionSelect = async (type, key) => {
     try {
       setShowSheet(false);
 
@@ -170,13 +166,13 @@ const StudentDetails = ({ navigation, route }) => {
 
       // DOCUMENT (FIXED)
       if (type === 3) {
-        const res = await DocumentPicker.pickSingle({
-          type: [DocumentPicker.types.allFiles],
-          copyTo: "cachesDirectory",
+        const res = await pick({
+          type: ["*/*"], // all files
+          allowMultiSelection: false,
         });
 
         file = {
-          path: res.fileCopyUri || res.uri,
+          path: res.uri,
           filename: res.name || "file",
           mime: res.type || "application/octet-stream",
         };
@@ -188,9 +184,7 @@ const StudentDetails = ({ navigation, route }) => {
 
       // FIX URI FOR IOS
       const fileUri =
-        Platform.OS === "ios"
-          ? file.path.replace("file://", "")
-          : file.path;
+        Platform.OS === "ios" ? file.path.replace("file://", "") : file.path;
 
       // IMAGE RATIO
       // if (file.mime?.includes("image")) {
@@ -207,48 +201,46 @@ const StudentDetails = ({ navigation, route }) => {
           uri: fileUri,
           fileName: file.filename,
           type: file.mime,
-        })
+        }),
       );
     } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
+      if (e?.code !== "DOCUMENT_PICKER_CANCELED") {
         console.log("Picker Error:", e);
       }
       // setUploadingKey(null);
     }
   };
 
-    /* ================= UPLOAD RESPONSE ================= */
-  
-    useEffect(() => {
-      if (responseUploadImage ) {
-        const payload = {
-              studentId: studentData?._id,
-              admissionLetterImage: responseUploadImage.Location,
-              isAdmissionLetterUploaded:1,
-              isAdmissionLetterReceived:1
-            };
+  /* ================= UPLOAD RESPONSE ================= */
 
-        dispatch(hitUpdateStudent(payload));
-        dispatch(clearUploadFileData());
-      }
-    }, [responseUploadImage]);
+  useEffect(() => {
+    if (responseUploadImage) {
+      const payload = {
+        studentId: studentData?._id,
+        admissionLetterImage: responseUploadImage.Location,
+        isAdmissionLetterUploaded: 1,
+        isAdmissionLetterReceived: 1,
+      };
 
-    const onPrintClick = () => {
-      // Implement print functionality here
-      dispatch(hitPrintStudentRecord({ studentId: studentData?._id }));
-    };
+      dispatch(hitUpdateStudent(payload));
+      dispatch(clearUploadFileData());
+    }
+  }, [responseUploadImage]);
 
+  const onPrintClick = () => {
+    // Implement print functionality here
+    dispatch(hitPrintStudentRecord({ studentId: studentData?._id }));
+  };
 
-      /* ================= PRINT STUDENT RECORD RESPONSE ================= */
+  /* ================= PRINT STUDENT RECORD RESPONSE ================= */
 
-    useEffect(() => {
-      if (responsePrintStudentRecord && responsePrintStudentRecord.status == 1) {
-        // Handle the print data, e.g., navigate to a print preview screen or trigger native print dialog
-        Linking.openURL(responsePrintStudentRecord.data);
-        dispatch(clearPrintStudentRecord());
-      }
-    }, [responsePrintStudentRecord]);
-  
+  useEffect(() => {
+    if (responsePrintStudentRecord && responsePrintStudentRecord.status == 1) {
+      // Handle the print data, e.g., navigate to a print preview screen or trigger native print dialog
+      Linking.openURL(responsePrintStudentRecord.data);
+      dispatch(clearPrintStudentRecord());
+    }
+  }, [responsePrintStudentRecord]);
 
   /* ================= UI ================= */
 
@@ -270,9 +262,7 @@ const StudentDetails = ({ navigation, route }) => {
             style={styles.profile}
           />
           <Text style={styles.name}>{studentData?.name}</Text>
-          <Text style={styles.info}>
-            +91 {studentData?.mobileNumber}
-          </Text>
+          <Text style={styles.info}>+91 {studentData?.mobileNumber}</Text>
           <Text style={styles.info}>{studentData?.email}</Text>
         </View>
 
@@ -280,45 +270,37 @@ const StudentDetails = ({ navigation, route }) => {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Documents</Text>
 
-          {renderFile(
-            "10+2 Marksheet",
-            studentData?.plusTwoImage,
-            "plusTwo"
-          )}
+          {renderFile("10+2 Marksheet", studentData?.plusTwoImage, "plusTwo")}
           {renderFile(
             "Passport Front",
             studentData?.passportImageFront,
-            "passFront"
+            "passFront",
           )}
           {renderFile(
             "Passport Back",
             studentData?.passportImageBack,
-            "passBack"
+            "passBack",
           )}
           {renderFile(
             "Aadhar Front",
             studentData?.aadhaarImageFront,
-            "aadhaarFront"
+            "aadhaarFront",
           )}
           {renderFile(
             "Aadhar Back",
             studentData?.aadhaarImageBack,
-            "aadhaarBack"
+            "aadhaarBack",
           )}
-          {renderFile(
-            "NEET Result",
-            studentData?.neetImage,
-            "neet"
-          )}
+          {renderFile("NEET Result", studentData?.neetImage, "neet")}
           {renderFile(
             "Police Verification",
             studentData?.studyPoliceVerificationImageBack,
-            "policeVerification"
+            "policeVerification",
           )}
           {renderFile(
             "Admission Letter",
             studentData?.admissionLetterImage,
-            "admissionLetter"
+            "admissionLetter",
           )}
         </View>
         <TouchableOpacity
@@ -336,22 +318,23 @@ const StudentDetails = ({ navigation, route }) => {
             Print
           </Text>
         </TouchableOpacity>
-        {agentType!=1 && 
+        {agentType != 1 && (
           <TouchableOpacity
             style={styles.logoutButtonStyle}
             onPress={() => setShowSheet(true)}
           >
             <Text
               style={{
-              color: appColors.white,
-              textAlign: "center",
-              fontWeight: "600",
-              fontSize: 16,
-            }}
-          >
-            Upload Admission Letter
-          </Text>
-        </TouchableOpacity>}
+                color: appColors.white,
+                textAlign: "center",
+                fontWeight: "600",
+                fontSize: 16,
+              }}
+            >
+              Upload Admission Letter
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       {/* EDIT BUTTON */}
@@ -361,7 +344,7 @@ const StudentDetails = ({ navigation, route }) => {
         </TouchableOpacity>
       )}
 
-   {showSheet && (
+      {showSheet && (
         <View style={styles.sheetOverlay}>
           <TouchableOpacity
             style={styles.overlayBg}
@@ -404,7 +387,6 @@ const StudentDetails = ({ navigation, route }) => {
           </View>
         </View>
       )}
-
     </SafeAreaView>
   );
 };
@@ -561,7 +543,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-    optionContainer: {
+  optionContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -575,17 +557,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelButton: {
-  marginTop: 15,
-  paddingVertical: 12,
-  borderTopWidth: 1,
-  borderColor: "#eee",
-  alignItems: "center",
-},
+    marginTop: 15,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderColor: "#eee",
+    alignItems: "center",
+  },
 
-cancelText: {
-  fontSize: 16,
-  fontWeight: "600",
-  color: "red",
-},
-
+  cancelText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "red",
+  },
 });

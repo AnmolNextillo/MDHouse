@@ -15,21 +15,17 @@ import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ImagePicker from "react-native-image-crop-picker";
-import DocumentPicker from "react-native-document-picker";
+import { pick } from "@react-native-documents/picker";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearAgentAddStudent,
   hitAgentAddStudent,
 } from "../../../redux/AgentAddStudentSlice";
-import {
-  clearUploadFileData,
-  uploadFile,
-} from "../../../redux/uploadFile";
+import { clearUploadFileData, uploadFile } from "../../../redux/uploadFile";
 import {
   clearUpdateStudent,
   hitUpdateStudent,
 } from "../../../redux/UpdateStudentSlice";
-
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,15 +61,15 @@ const AddStudent = ({ navigation, route }) => {
   /* ================= REDUX ================= */
 
   const responseAddStudent = useSelector(
-    (state) => state.agentAddStudentReducer.data
+    (state) => state.agentAddStudentReducer.data,
   );
 
   const responseUploadImage = useSelector(
-    (state) => state.uploadFileReducer.data
+    (state) => state.uploadFileReducer.data,
   );
 
   const responseUpdateStudent = useSelector(
-    (state) => state.updateStudentReducer.data
+    (state) => state.updateStudentReducer.data,
   );
 
   /* ================= PREFILL ================= */
@@ -142,13 +138,13 @@ const AddStudent = ({ navigation, route }) => {
 
       // DOCUMENT (FIXED)
       if (type === 3) {
-        const res = await DocumentPicker.pickSingle({
-          type: [DocumentPicker.types.allFiles],
-          copyTo: "cachesDirectory",
+        const res = await pick({
+          type: ["*/*"], // all files
+          allowMultiSelection: false,
         });
 
         file = {
-          path: res.fileCopyUri || res.uri,
+          path: res.uri,
           filename: res.name || "file",
           mime: res.type || "application/octet-stream",
         };
@@ -160,9 +156,7 @@ const AddStudent = ({ navigation, route }) => {
 
       // FIX URI FOR IOS
       const fileUri =
-        Platform.OS === "ios"
-          ? file.path.replace("file://", "")
-          : file.path;
+        Platform.OS === "ios" ? file.path.replace("file://", "") : file.path;
 
       // IMAGE RATIO
       if (file.mime?.includes("image")) {
@@ -179,10 +173,10 @@ const AddStudent = ({ navigation, route }) => {
           uri: fileUri,
           fileName: file.filename,
           type: file.mime,
-        })
+        }),
       );
     } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
+      if (e?.code !== "DOCUMENT_PICKER_CANCELED") {
         console.log("Picker Error:", e);
       }
       setUploadingKey(null);
@@ -240,8 +234,7 @@ const AddStudent = ({ navigation, route }) => {
       alert("Student added successfully");
       dispatch(clearAgentAddStudent());
       navigation.goBack();
-    }
-    else if (responseAddStudent!=null && responseAddStudent?.status === 0) {
+    } else if (responseAddStudent != null && responseAddStudent?.status === 0) {
       alert(responseAddStudent?.message || "Failed to add student");
       dispatch(clearAgentAddStudent());
     }
@@ -499,51 +492,51 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelButton: {
-  marginTop: 15,
-  paddingVertical: 12,
-  borderTopWidth: 1,
-  borderColor: "#eee",
-  alignItems: "center",
-},
+    marginTop: 15,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderColor: "#eee",
+    alignItems: "center",
+  },
 
-cancelText: {
-  fontSize: 16,
-  fontWeight: "600",
-  color: "red",
-},
+  cancelText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "red",
+  },
 
-uploadOverlay: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.7)",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 999,
-},
+  uploadOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
 
-uploadContainer: {
-  backgroundColor: appColors.white,
-  borderRadius: 16,
-  padding: 32,
-  alignItems: "center",
-  width: "80%",
-  maxWidth: 300,
-},
+  uploadContainer: {
+    backgroundColor: appColors.white,
+    borderRadius: 16,
+    padding: 32,
+    alignItems: "center",
+    width: "80%",
+    maxWidth: 300,
+  },
 
-uploadTitle: {
-  marginTop: 16,
-  fontSize: 20,
-  fontWeight: "700",
-  color: appColors.black,
-},
+  uploadTitle: {
+    marginTop: 16,
+    fontSize: 20,
+    fontWeight: "700",
+    color: appColors.black,
+  },
 
-uploadSubtitle: {
-  marginTop: 8,
-  fontSize: 14,
-  color: appColors.grey || "#666",
-  textAlign: "center",
-},
+  uploadSubtitle: {
+    marginTop: 8,
+    fontSize: 14,
+    color: appColors.grey || "#666",
+    textAlign: "center",
+  },
 });

@@ -15,7 +15,7 @@ import { appColors } from "../../../utils/color";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ImagePicker from "react-native-image-crop-picker";
-import * as DocumentPicker from "react-native-document-picker";
+import { pick } from "@react-native-documents/picker";
 import { useDispatch, useSelector } from "react-redux";
 import Pdf from "react-native-pdf";
 import {
@@ -69,15 +69,15 @@ const UpdateProfile = ({ navigation }) => {
   /* ================= REDUX ================= */
 
   const responseUpdateProfile = useSelector(
-    (state) => state.agentUpdateProfileReducer.data
+    (state) => state.agentUpdateProfileReducer.data,
   );
 
   const responseUploadImage = useSelector(
-    (state) => state.uploadFileReducer.data
+    (state) => state.uploadFileReducer.data,
   );
 
   const responseGetProfile = useSelector(
-    (state) => state.getProfileReducer.data
+    (state) => state.getProfileReducer.data,
   );
 
   /* ================= GET PROFILE ================= */
@@ -117,7 +117,7 @@ const UpdateProfile = ({ navigation }) => {
     setShowSheet(true);
   };
 
-   const handleOptionSelect = async (type, key) => {
+  const handleOptionSelect = async (type, key) => {
     try {
       setShowSheet(false);
 
@@ -145,13 +145,13 @@ const UpdateProfile = ({ navigation }) => {
 
       // DOCUMENT (FIXED)
       if (type === 3) {
-        const res = await DocumentPicker.pickSingle({
-          type: [DocumentPicker.types.allFiles],
-          copyTo: "cachesDirectory",
+        const res = await pick({
+          type: ["*/*"], // all files
+          allowMultiSelection: false,
         });
 
         file = {
-          path: res.fileCopyUri || res.uri,
+          path: res.uri,
           filename: res.name || "file",
           mime: res.type || "application/octet-stream",
         };
@@ -163,9 +163,7 @@ const UpdateProfile = ({ navigation }) => {
 
       // FIX URI FOR IOS
       const fileUri =
-        Platform.OS === "ios"
-          ? file.path.replace("file://", "")
-          : file.path;
+        Platform.OS === "ios" ? file.path.replace("file://", "") : file.path;
 
       // IMAGE RATIO
       if (file.mime?.includes("image")) {
@@ -182,10 +180,10 @@ const UpdateProfile = ({ navigation }) => {
           uri: fileUri,
           fileName: file.filename,
           type: file.mime,
-        })
+        }),
       );
     } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
+      if (e?.code !== "DOCUMENT_PICKER_CANCELED") {
         console.log("Picker Error:", e);
       }
       setUploadingKey(null);
@@ -207,14 +205,15 @@ const UpdateProfile = ({ navigation }) => {
       }
 
       if (type === 3) {
-        const res = await DocumentPicker.pick({
-          type: [DocumentPicker.types.pdf],
+        const res = await pick({
+          type: ["*/*"], // all files
+          allowMultiSelection: false,
         });
 
         file = {
-          path: res[0].uri,
-          filename: res[0].name,
-          mime: res[0].type,
+          path: res.uri,
+          filename: res.name || "file",
+          mime: res.type || "application/octet-stream",
         };
       }
 
@@ -227,7 +226,7 @@ const UpdateProfile = ({ navigation }) => {
           uri: file.path,
           fileName: file.filename || `file_${Date.now()}`,
           type: file.mime,
-        })
+        }),
       );
     } catch (e) {
       setUploadingKey(null);
@@ -274,7 +273,7 @@ const UpdateProfile = ({ navigation }) => {
         panCardImage: images.panImage,
         aadhaarImageFront: images.aadhaarFront,
         aadhaarImageBack: images.aadhaarBack,
-      })
+      }),
     );
   };
 
@@ -327,11 +326,15 @@ const UpdateProfile = ({ navigation }) => {
                 onLoadComplete={() =>
                   setLoadingFiles((p) => ({ ...p, [key]: false }))
                 }
-                onError={() =>
-                  setLoadingFiles((p) => ({ ...p, [key]: false }))
-                }
+                onError={() => setLoadingFiles((p) => ({ ...p, [key]: false }))}
               />
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <TouchableOpacity
                   style={styles.openBtn}
                   onPress={() => Linking.openURL(uri)}
@@ -345,8 +348,6 @@ const UpdateProfile = ({ navigation }) => {
                   <Text style={styles.openText}>Change</Text>
                 </TouchableOpacity>
               </View>
-
-
             </View>
           ) : (
             <View style={styles.imageBox}>
@@ -363,7 +364,6 @@ const UpdateProfile = ({ navigation }) => {
                 <Text style={styles.openText}>Change</Text>
               </TouchableOpacity>
             </View>
-
           )}
         </TouchableOpacity>
       </View>
@@ -391,24 +391,60 @@ const UpdateProfile = ({ navigation }) => {
 
       <ScrollView>
         <Text style={styles.label}>Name</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="Name"
+        />
         <Text style={styles.label}>Company Name</Text>
-        <TextInput style={styles.input} value={companyName} onChangeText={setCompanyName} placeholder="Company Name"/>
+        <TextInput
+          style={styles.input}
+          value={companyName}
+          onChangeText={setCompanyName}
+          placeholder="Company Name"
+        />
         <Text style={styles.label}>Mobile</Text>
-        <TextInput style={styles.input} value={mobile} onChangeText={setMobile} placeholder="Mobile" inputMode="tel"/>
+        <TextInput
+          style={styles.input}
+          value={mobile}
+          onChangeText={setMobile}
+          placeholder="Mobile"
+          inputMode="tel"
+        />
         <Text style={styles.label}>Office Contact Number</Text>
-        <TextInput style={styles.input} value={officeContact} onChangeText={setOfficeContact} placeholder="Office Contact Number" inputMode="tel"/>
+        <TextInput
+          style={styles.input}
+          value={officeContact}
+          onChangeText={setOfficeContact}
+          placeholder="Office Contact Number"
+          inputMode="tel"
+        />
         <Text style={styles.label}>Head Office Address</Text>
-        <TextInput style={styles.input} value={headOfficeAddress} onChangeText={setHeadOfficeAddress} placeholder="Head Office Address" />
+        <TextInput
+          style={styles.input}
+          value={headOfficeAddress}
+          onChangeText={setHeadOfficeAddress}
+          placeholder="Head Office Address"
+        />
         <Text style={styles.label}>GST</Text>
-        <TextInput style={styles.input} value={gst} onChangeText={setGst} placeholder="GST" />
+        <TextInput
+          style={styles.input}
+          value={gst}
+          onChangeText={setGst}
+          placeholder="GST"
+        />
 
         {renderFile("PAN Card", images.panImage, "panImage")}
         {renderFile("Aadhaar Front", images.aadhaarFront, "aadhaarFront")}
         {renderFile("Aadhaar Back", images.aadhaarBack, "aadhaarBack")}
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Update Profile</Text>}
+          {submitting ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Update Profile</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
       {showSheet && (
