@@ -338,6 +338,13 @@ const ProfileOptions = ({ navigation }) => {
                 <Text style={styles.lableStyle}>Student List</Text>
                 <RightArrow height={24} width={24} />
               </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.itemStyle}
+                onPress={() => navigation.navigate("ChangePassword", { from: 2 })}
+              >
+                <Text style={styles.lableStyle}>Change Password</Text>
+                <RightArrow height={24} width={24} />
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity

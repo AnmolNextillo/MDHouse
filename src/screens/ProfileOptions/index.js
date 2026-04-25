@@ -40,21 +40,20 @@ const ProfileOptios = ({ navigation }) => {
   const [profileData, setProfileData] = useState(null);
   const [profileImage, setProfileImage] = useState("");
   const responseProfileData = useSelector(
-    (state) => state.getProfileReducer.data
+    (state) => state.getProfileReducer.data,
   );
   const responseDeleteAccount = useSelector(
-    (state) => state.deleteAccountReducer.data
+    (state) => state.deleteAccountReducer.data,
   );
 
   const responseUploadImage = useSelector(
-    (state) => state.uploadFileReducer.data
+    (state) => state.uploadFileReducer.data,
   );
 
   const responseVersion = useSelector((state) => state.getVersionReducer.data);
 
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
-
 
   useEffect(() => {
     if (isFocused) {
@@ -66,19 +65,26 @@ const ProfileOptios = ({ navigation }) => {
   useEffect(() => {
     if (responseProfileData != null && responseProfileData.status == 1) {
       setProfileData(responseProfileData.data);
-      setProfileImage(responseProfileData.data.profileImage)
+      setProfileImage(responseProfileData.data.profileImage);
     }
   }, [responseProfileData]);
 
   useEffect(() => {
     if (responseDeleteAccount != null && responseDeleteAccount.status == 1) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      });
-      dispatch(clearDeleteAccount());
+      clearData();
     }
   }, [responseDeleteAccount]);
+
+  const clearData = async () => {
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("userType");
+    await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "UserType" }],
+    });
+    dispatch(clearDeleteAccount());
+  };
 
   const onItemClick = (value) => {
     setModalVisible(false);
@@ -99,9 +105,23 @@ const ProfileOptios = ({ navigation }) => {
     navigation.navigate("UserType");
   };
 
-
   const onDeleteAccountClick = () => {
-    dispatch(hitDeleteAccount());
+      Alert.alert(
+        "The MD House",
+        "Are you sure you want to delete your account?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Delete",
+            onPress: () => {
+              dispatch(hitDeleteAccount());
+            },
+          },
+        ],
+      );
   };
 
   useEffect(() => {
@@ -127,7 +147,6 @@ const ProfileOptios = ({ navigation }) => {
 
       console.log("latestVersion ===> ", latestVersion);
       if (currentVersion < latestVersion) {
-
         await AsyncStorage.removeItem("token");
         await AsyncStorage.removeItem("userType");
         await AsyncStorage.clear(); // Clear AsyncStorage on app launch to prevent stale data issues
@@ -141,7 +160,7 @@ const ProfileOptios = ({ navigation }) => {
           [
             { text: "Update Now", onPress: () => Linking.openURL(updateUrl) },
             //  { text: "Later", style: "cancel" },
-          ].filter(Boolean)
+          ].filter(Boolean),
         );
       }
     } catch (error) {
@@ -177,7 +196,7 @@ const ProfileOptios = ({ navigation }) => {
             });
           },
         },
-      ]
+      ],
     );
   }
 
@@ -190,7 +209,7 @@ const ProfileOptios = ({ navigation }) => {
       mediaType: "photo",
       freeStyleCropEnabled: true, // 🔥 allows moving crop edges
     })
-      .then(image => {
+      .then((image) => {
         console.log("📸 Camera Image:", image);
         const payload = {
           uri: image.path,
@@ -199,7 +218,7 @@ const ProfileOptios = ({ navigation }) => {
         };
         dispatch(uploadFile(payload));
       })
-      .catch(err => {
+      .catch((err) => {
         setModalVisible(false);
         if (err.code === "E_NO_CAMERA_PERMISSION") {
           showPermissionDeniedAlert();
@@ -217,7 +236,7 @@ const ProfileOptios = ({ navigation }) => {
       mediaType: "photo",
       freeStyleCropEnabled: true, // 🔥 allows moving crop edges
     })
-      .then(image => {
+      .then((image) => {
         console.log("🖼️ Gallery Image:", image);
         const payload = {
           uri: image.path,
@@ -226,7 +245,7 @@ const ProfileOptios = ({ navigation }) => {
         };
         dispatch(uploadFile(payload));
       })
-      .catch(err => {
+      .catch((err) => {
         setModalVisible(false);
         if (err.code === "E_NO_LIBRARY_PERMISSION") {
           showPermissionDeniedAlert();
@@ -236,14 +255,16 @@ const ProfileOptios = ({ navigation }) => {
   };
 
   useEffect(() => {
-
-    if (profileData != null && profileData.studentType == 2 && responseUploadImage != null) {
+    if (
+      profileData != null &&
+      profileData.studentType == 2 &&
+      responseUploadImage != null
+    ) {
       setProfileImage(responseUploadImage.Location);
       setImageModalVisible(false);
 
       const payload = {
         profileImage: responseUploadImage.Location,
-
       };
       dispatch(hitUpdateProfile(payload));
     }
@@ -259,8 +280,8 @@ const ProfileOptios = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Profile Details</Text>
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("PdfRecreatedScreen")
+          onPress={
+            () => navigation.navigate("PdfRecreatedScreen")
             // Linking.openURL(
             //   "https://kcmschool.s3.ap-south-1.amazonaws.com/1763444672_Indian%20Students%E2%80%99%20Society%20%28%20MD%20House%20%29.pdf"
             // )
@@ -297,9 +318,13 @@ const ProfileOptios = ({ navigation }) => {
                   />
                 </TouchableOpacity>
                 {profileData.studentType == 2 && (
-                  <TouchableOpacity onPress={() => openModal()} style={{ marginLeft: -20, marginTop: 40 }}>
+                  <TouchableOpacity
+                    onPress={() => openModal()}
+                    style={{ marginLeft: -20, marginTop: 40 }}
+                  >
                     <EditIcon height={24} width={24} fill={appColors.black} />
-                  </TouchableOpacity>)}
+                  </TouchableOpacity>
+                )}
                 <View style={{ flex: 1, paddingHorizontal: 16 }}>
                   <Text style={styles.userNameStyle}>{profileData.name}</Text>
                   <Text style={styles.simpleTextStyle}>
@@ -394,9 +419,26 @@ const ProfileOptios = ({ navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.itemStyle}
-                  onPress={() => Linking.openURL(Platform.OS == "android" ? "https://play.google.com/store/apps/details?id=com.nextillo&pcampaignid=web_share" : "https://apps.apple.com/in/app/nextillo/id1597259662")}
+                  onPress={() =>
+                    Linking.openURL(
+                      Platform.OS == "android"
+                        ? "https://play.google.com/store/apps/details?id=com.nextillo&pcampaignid=web_share"
+                        : "https://apps.apple.com/in/app/nextillo/id1597259662",
+                    )
+                  }
                 >
-                  <Text style={styles.lableStyle}>Prepare FMGE with Nextillo</Text>
+                  <Text style={styles.lableStyle}>
+                    Prepare FMGE with Nextillo
+                  </Text>
+                  <RightArrow height={24} width={24} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.itemStyle}
+                  onPress={() =>
+                    navigation.navigate("ChangePassword", { from: 1 })
+                  }
+                >
+                  <Text style={styles.lableStyle}>Change Password</Text>
                   <RightArrow height={24} width={24} />
                 </TouchableOpacity>
               </View>
@@ -467,7 +509,6 @@ const ProfileOptios = ({ navigation }) => {
         onClose={() => setImageModalVisible(false)}
         onCamera={openCamera}
         onGallery={openGallery}
-
       />
     </SafeAreaView>
   );

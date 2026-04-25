@@ -79,6 +79,7 @@ import AdminGallery from "./src/screens/Admin/AdminGallery/index.js";
 import AdminAddGallery from "./src/screens/Admin/AdminAddGallery/index.js";
 import AdminAlumni from "./src/screens/Admin/AdminAlumni/index.js";
 import AdminSettings from "./src/screens/Admin/AdminSettings/index.js";
+import ChangePasswordScreen from "./src/screens/ChangePassword/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -466,6 +467,7 @@ const App = () => {
               <Stack.Screen name="AdminGallery" component={AdminGallery} />
               <Stack.Screen name="AdminAddGallery" component={AdminAddGallery} />
               <Stack.Screen name="AdminSettings" component={AdminSettings} />
+              <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
 
             </Stack.Navigator>
           </View>

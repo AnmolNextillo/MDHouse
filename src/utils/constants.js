@@ -27,6 +27,7 @@ export const studentAchievements  = "v1/student/studentAchievements";
 export const getAttendance  = "v1/student/getAttendance";
 export const home  = "v1/student/home";
 export const checkUser  = "v1/checkUser";
+export const updatePassword  = "v1/student/updatePassword";
 export const studentOtp  = "v2/student/otpVerification";
 export const studentResendOtp  = "v2/student/resendOtp";
 
@@ -39,6 +40,7 @@ export const agentAddStudent  = "v1/agent/addStudent";
 export const agentUpdateStudent  = "v1/agent/updateStudent";
 export const agentNotifications  = "v1/agent/notifications";
 export const agentDashboard  = "v1/agent/dashboard";
+export const agentUpdatePassword  = "v1/agent/updatePassword";
 export const getChatWithAdmin  = "v1/agent/getChatWithAdmin";
 export const sendMessageToAdmin  = "v1/agent/sendMessageToAdmin";
 export const getStudentDetails  = "v1/agent/getStudentDetails";
