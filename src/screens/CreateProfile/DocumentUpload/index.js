@@ -28,9 +28,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DocumentPickerModal from "../../../components/DocumentPickerModal";
 import { pick } from "@react-native-documents/picker";
 import { requestAllPermissions } from "../../../utils/constants";
+import { useIsFocused } from "@react-navigation/native";
 
 const DocumentUpload = ({ navigation, route }) => {
   const { from } = route.params;
+
+  const isFocused = useIsFocused()
 
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -338,7 +341,7 @@ const openGallery = () => {
   }, [responseUploadImage]);
 
   useEffect(() => {
-    if (responseUpdateProfile != null && responseUpdateProfile.status == 1) {
+    if (responseUpdateProfile != null && responseUpdateProfile.status == 1 && isFocused) {
       if (from == 3 || from == 1) {
         navigation.reset({
           index: 0,

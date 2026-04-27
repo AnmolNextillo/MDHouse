@@ -14,12 +14,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { hitGetUni } from "../../../redux/GetUniSlice";
+import { useIsFocused } from "@react-navigation/native";
 
 const UniversityInfo = ({ navigation, route }) => {
   const { from } = route.params;
   const [selectedCountry, setSelectedCountry] = useState("Uzbekistan");
   const [selectedUni, setSelectedUni] = useState(
-    "Samarkand State Medical University"
+    "Samarkand State Medical University",
   );
   const [selectedYear, setSelectedYear] = useState("Select Year of Admission");
   const [year, setYear] = useState("Select Year");
@@ -30,13 +31,15 @@ const UniversityInfo = ({ navigation, route }) => {
   const [semesterId, setSemesterId] = useState(1);
   const [profileData, setProfileData] = useState(null);
   const responseProfileData = useSelector(
-    (state) => state.getProfileReducer.data
+    (state) => state.getProfileReducer.data,
   );
 
   const dispatch = useDispatch();
 
+  const isFocused = useIsFocused();
+
   const responseUpdateProfile = useSelector(
-    (state) => state.updateProfileReducer.data
+    (state) => state.updateProfileReducer.data,
   );
   const responseGetUni = useSelector((state) => state.getUniReducer.data);
 
@@ -64,7 +67,7 @@ const UniversityInfo = ({ navigation, route }) => {
     {
       id: 6,
       name: "6th",
-    }
+    },
   ];
   const years = [
     {
@@ -205,7 +208,7 @@ const UniversityInfo = ({ navigation, route }) => {
     } else {
       await AsyncStorage.setItem(
         "step",
-        from == JSON.stringify(1) ? JSON.stringify(2) : JSON.stringify(6)
+        from == JSON.stringify(1) ? JSON.stringify(2) : JSON.stringify(6),
       );
       const payload = {
         studyCountry: selectedCountry,
@@ -229,7 +232,7 @@ const UniversityInfo = ({ navigation, route }) => {
       setSelectedYear(responseProfileData.data.yearOfJoining);
       setYear(responseProfileData.data.yearStudy);
       const semesterName = semesters.find(
-        (item) => item.id === responseProfileData.data.semester
+        (item) => item.id === responseProfileData.data.semester,
       )?.name;
       setSelectedSemester(semesterName);
       setSemesterId(responseProfileData.data.semester);
@@ -238,18 +241,21 @@ const UniversityInfo = ({ navigation, route }) => {
   }, [responseProfileData]);
 
   useEffect(() => {
-    if (responseUpdateProfile != null && responseUpdateProfile.status == 1) {
-      if (from == 1) {
-        navigation.navigate("StudentDetials", { from: 1 });
+    if (isFocused) {
+      if (responseUpdateProfile != null && responseUpdateProfile.status == 1) {
+        dispatch(clearUpdateProfile());
+        if (from == 1) {
+          navigation.navigate("StudentDetials", { from: 1 });
+        } else {
+          navigation.goBack();
+        }
       } else {
-        navigation.goBack();
-      }
-    } else {
-      if (responseUpdateProfile != null) {
-        Alert.alert("MD House", responseUpdateProfile.message);
+        if (responseUpdateProfile != null) {
+          Alert.alert("MD House", responseUpdateProfile.message);
+          dispatch(clearUpdateProfile());
+        }
       }
     }
-    dispatch(clearUpdateProfile());
   }, [responseUpdateProfile]);
 
   const onBackClick = () => {
@@ -338,19 +344,19 @@ const UniversityInfo = ({ navigation, route }) => {
           selectedModal == 0
             ? selectCountry
             : selectedModal == 1
-              ? selectCountry
-              : selectedModal == 2
-                ? selectYear
-                : selectSemester
+            ? selectCountry
+            : selectedModal == 2
+            ? selectYear
+            : selectSemester
         }
         itemList={
           selectedModal == 0
             ? countries
             : selectedModal == 1
-              ? countries
-              : selectedModal == 2
-                ? years
-                : semesters
+            ? countries
+            : selectedModal == 2
+            ? years
+            : semesters
         }
       />
       {universities != null && (
@@ -359,8 +365,10 @@ const UniversityInfo = ({ navigation, route }) => {
             selectedModal == 1
               ? "Select University"
               : selectedModal == 2
-                ? "Select Year"
-                : selectedModal == 3 ? "Select Semester" : "Select Year"
+              ? "Select Year"
+              : selectedModal == 3
+              ? "Select Semester"
+              : "Select Year"
           }
           modalVisible={modalVisibleUni}
           setModalVisible={setModalVisibleUni}
@@ -368,22 +376,23 @@ const UniversityInfo = ({ navigation, route }) => {
             selectedModal == 0
               ? selectCountry
               : selectedModal == 1
-                ? selectUni
-                : selectedModal == 2
-                  ? selectYear
-                  : selectedModal == 3 ? selectSemester
-                    : studyYear
+              ? selectUni
+              : selectedModal == 2
+              ? selectYear
+              : selectedModal == 3
+              ? selectSemester
+              : studyYear
           }
           itemList={
             selectedModal == 0
               ? countries
               : selectedModal == 1
-                ? universities
-                : selectedModal == 2
-                  ? years
-                  : selectedModal == 3
-                    ? semesters
-                    : yearArr
+              ? universities
+              : selectedModal == 2
+              ? years
+              : selectedModal == 3
+              ? semesters
+              : yearArr
           }
         />
       )}

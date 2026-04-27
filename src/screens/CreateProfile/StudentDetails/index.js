@@ -86,12 +86,18 @@ const StudentDetials = ({ navigation, route }) => {
 
   useEffect(() => {
     if (isFocused) {
-    dispatch(hitGetProfile({usertype:1}));
+      dispatch(hitGetProfile({ usertype: 1 }));
     }
   }, [isFocused]);
 
   const addStudentDetails = async () => {
-    if (!name || !bloodGroup || bloodGroup === "Select Blood Group" || !passportNumber || !phoneNumber) {
+    if (
+      !name ||
+      !bloodGroup ||
+      bloodGroup === "Select Blood Group" ||
+      !passportNumber ||
+      !phoneNumber
+    ) {
       Alert.alert("MD House", "All fields are required");
       return;
     }
@@ -134,18 +140,21 @@ const StudentDetials = ({ navigation, route }) => {
   /* ================= RESPONSE ================= */
 
   useEffect(() => {
-    if (responseUpdateProfile) {
-      if (responseUpdateProfile.status === 1) {
-        if (from === 1) {
-          navigation.navigate("ParentDetials", { from: 1 });
+    if (isFocused) {
+      if (responseUpdateProfile) {
+        console.log("1 =====> ", responseProfileData);
+        if (responseUpdateProfile.status === 1) {
+          dispatch(clearUpdateProfile());
+          if (from == 1) {
+            navigation.navigate("ParentDetials", { from: 1 });
+          } else {
+            navigation.goBack();
+          }
         } else {
-          navigation.goBack();
+          Alert.alert("MD House", responseUpdateProfile.message);
+          dispatch(clearUpdateProfile());
         }
-      } else {
-        Alert.alert("MD House", responseUpdateProfile.message);
       }
-
-      dispatch(clearUpdateProfile());
     }
   }, [responseUpdateProfile]);
 

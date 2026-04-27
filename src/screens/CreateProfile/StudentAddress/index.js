@@ -23,10 +23,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CountryCodeModal from "../../../components/CountryCodeModal";
 import countries from "../../../assets/countries.json";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useIsFocused } from "@react-navigation/native";
 
 const StudentAddress = ({ navigation, route }) => {
   const { from } = route.params;
   const dispatch = useDispatch();
+
+  const isFocused = useIsFocused();
 
   const responseProfileData = useSelector(
     (state) => state.getProfileReducer.data,
@@ -147,7 +150,7 @@ const StudentAddress = ({ navigation, route }) => {
   /* ================= RESPONSE HANDLING ================= */
 
   useEffect(() => {
-    if (responseUpdateProfile) {
+    if (isFocused && responseUpdateProfile) {
       if (responseUpdateProfile.status === 1) {
         if (from === 1) {
           navigation.navigate("DocumentUpload", { from: 3 });

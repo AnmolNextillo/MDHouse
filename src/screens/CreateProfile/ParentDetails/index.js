@@ -24,17 +24,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import CountryCodeModal from "../../../components/CountryCodeModal";
 import countries from "../../../assets/countries.json";
+import { useIsFocused } from "@react-navigation/native";
 
 const ParentDetails = ({ navigation, route }) => {
   const { from } = route.params;
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
   // const countries = getCountries();
 
   const responseProfileData = useSelector(
-    (state) => state.getProfileReducer.data
+    (state) => state.getProfileReducer.data,
   );
   const responseUpdateProfile = useSelector(
-    (state) => state.updateProfileReducer.data
+    (state) => state.updateProfileReducer.data,
   );
 
   /* ================= STATES ================= */
@@ -61,14 +63,23 @@ const ParentDetails = ({ navigation, route }) => {
   /* ================= UPDATE PROFILE ================= */
 
   const updateParentDetails = async () => {
-    if (!fatherName || !fatherEmail || !motherName || !motherEmail || !fatherPhoneNumber || !fatherWappNumber || !motherPhoneNumber || !motherWappNumber) {
+    if (
+      !fatherName ||
+      !fatherEmail ||
+      !motherName ||
+      !motherEmail ||
+      !fatherPhoneNumber ||
+      !fatherWappNumber ||
+      !motherPhoneNumber ||
+      !motherWappNumber
+    ) {
       Alert.alert("MD House", "All fields are required");
       return;
     }
 
     await AsyncStorage.setItem(
       "step",
-      from === 1 ? JSON.stringify(4) : JSON.stringify(6)
+      from === 1 ? JSON.stringify(4) : JSON.stringify(6),
     );
 
     const payload = {
@@ -95,7 +106,6 @@ const ParentDetails = ({ navigation, route }) => {
   const selectCountry = (item) => {
     console.log("Selected Country:", item);
     const dialCode = item.dialCode;
-    
 
     switch (selectedModal) {
       case "fatherMobile":
@@ -148,29 +158,27 @@ const ParentDetails = ({ navigation, route }) => {
   /* ================= RESPONSE HANDLING ================= */
 
   useEffect(() => {
-    if (responseUpdateProfile) {
-      if (responseUpdateProfile.status === 1) {
-        if (from === 1) {
-          navigation.navigate("StudentAddress", { from: 1 });
+    if (isFocused) {
+      if (responseUpdateProfile) {
+        console.log("Parent Details Screen ===>", responseProfileData);
+        if (responseUpdateProfile.status === 1) {
+          dispatch(clearUpdateProfile());
+          if (from === 1) {
+            navigation.navigate("StudentAddress", { from: 1 });
+          } else {
+            navigation.goBack();
+          }
         } else {
-          navigation.goBack();
+          Alert.alert("MD House", responseUpdateProfile.message);
+          dispatch(clearUpdateProfile());
         }
-      } else {
-        Alert.alert("MD House", responseUpdateProfile.message);
       }
-      dispatch(clearUpdateProfile());
     }
   }, [responseUpdateProfile]);
 
   /* ================= UI ================= */
 
-  const renderPhoneInput = (
-    label,
-    number,
-    setNumber,
-    code,
-    modalKey
-  ) => (
+  const renderPhoneInput = (label, number, setNumber, code, modalKey) => (
     <>
       <Text style={styles.labelStyle}>{label}</Text>
       <View style={styles.phoneWrapper}>
@@ -234,7 +242,7 @@ const ParentDetails = ({ navigation, route }) => {
           fatherPhoneNumber,
           setFatherPhoneNumber,
           fatherCountryCode,
-          "fatherMobile"
+          "fatherMobile",
         )}
 
         {renderPhoneInput(
@@ -242,7 +250,7 @@ const ParentDetails = ({ navigation, route }) => {
           fatherWappNumber,
           setFatherWappNumber,
           fatherCountryCodeW,
-          "fatherWhatsapp"
+          "fatherWhatsapp",
         )}
 
         {/* Mother */}
@@ -272,7 +280,7 @@ const ParentDetails = ({ navigation, route }) => {
           motherPhoneNumber,
           setMotherPhoneNumber,
           motherCountryCode,
-          "motherMobile"
+          "motherMobile",
         )}
 
         {renderPhoneInput(
@@ -280,7 +288,7 @@ const ParentDetails = ({ navigation, route }) => {
           motherWappNumber,
           setMotherWappNumber,
           motherCountryCodeW,
-          "motherWhatsapp"
+          "motherWhatsapp",
         )}
 
         <TouchableOpacity
@@ -292,7 +300,7 @@ const ParentDetails = ({ navigation, route }) => {
       </KeyboardAwareScrollView>
 
       {/* COUNTRY MODAL */}
-     <CountryCodeModal
+      <CountryCodeModal
         modalVisible={modalVisibleCountry}
         setModalVisible={setModalVisibleCountry}
         onItemSelect={selectCountry}
