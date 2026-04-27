@@ -19,6 +19,7 @@ import { appColors } from "../../../utils/color";
 import { hitAdminAddBanner, clearAdminAddBanner } from "../../../redux/admin_apis/AdminAddBannerSlice";
 import { uploadFile, clearUploadFileData } from "../../../redux/uploadFile";
 import { requestAllPermissions } from "../../../utils/constants";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AdminAddBanner = ({ navigation }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -174,9 +175,11 @@ const AdminAddBanner = ({ navigation }) => {
         <Text style={styles.headerText}>Add Banner</Text>
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         <ScrollView
           contentContainerStyle={styles.content}
@@ -217,7 +220,7 @@ const AdminAddBanner = ({ navigation }) => {
             )}
           </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

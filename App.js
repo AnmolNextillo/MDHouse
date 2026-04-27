@@ -138,7 +138,7 @@ const App = () => {
   // }, []);
 
   // useEffect(() => {
-    useScreenSecurity();
+  useScreenSecurity();
   // }, []);
 
   useEffect(() => {
@@ -148,7 +148,14 @@ const App = () => {
         const token = await AsyncStorage.getItem("token");
         const step = await AsyncStorage.getItem("step");
         const studentType = await AsyncStorage.getItem("userType");
-        console.log("Token found:", token, "Step ===> ", step, "Type ===> ", studentType);
+        console.log(
+          "Token found:",
+          token,
+          "Step ===> ",
+          step,
+          "Type ===> ",
+          studentType,
+        );
         if (token) {
           if (studentType == 3 || studentType == 4) {
             const screen = "BottomBar";
@@ -159,8 +166,7 @@ const App = () => {
             const screen = "BottomBar";
             setInitialRoute(screen);
             return;
-          }
-          else {
+          } else {
             if (step == 6) {
               setInitialRoute("BottomBar");
             } else {
@@ -184,8 +190,8 @@ const App = () => {
   }, [fcmToken]);
 
   useEffect(() => {
-    console.log("Initial Route ===> ", initialRoute)
-  }, [initialRoute])
+    console.log("Initial Route ===> ", initialRoute);
+  }, [initialRoute]);
 
   // Request permissions (iOS requires explicit request; Android API 33+ requires POST_NOTIFICATIONS)
   async function requestUserPermission() {
@@ -250,13 +256,18 @@ const App = () => {
         // );
 
         setAlertData({
-          title: remoteMessage.data?.title || remoteMessage.notification?.title || "Notification",
-          message: remoteMessage.notification?.body || JSON.stringify(remoteMessage.data),
+          title:
+            remoteMessage.data?.title ||
+            remoteMessage.notification?.title ||
+            "Notification",
+          message:
+            remoteMessage.notification?.body ||
+            JSON.stringify(remoteMessage.data),
         });
         setAlertVisible(true);
         // store message to display in UI
         setMessages((prev) => [remoteMessage, ...prev]);
-      }
+      },
     );
 
     // 5) When a notification opens the app from background state
@@ -264,12 +275,12 @@ const App = () => {
       (remoteMessage) => {
         console.log(
           "[FCM] Notification caused app to open from background state:",
-          remoteMessage
+          remoteMessage,
         );
         if (remoteMessage) {
           setMessages((prev) => [remoteMessage, ...prev]);
         }
-      }
+      },
     );
 
     // 6) Check whether an initial notification opened the app from a quit state
@@ -279,7 +290,7 @@ const App = () => {
         if (remoteMessage) {
           console.log(
             "[FCM] App opened from quit state by notification:",
-            remoteMessage
+            remoteMessage,
           );
           setMessages((prev) => [remoteMessage, ...prev]);
         }
@@ -301,133 +312,88 @@ const App = () => {
   return (
     <>
       <StatusBar
-        barStyle="dark-content" // or "dark-content"
-        backgroundColor={appColors.primaryColorLight} // match your app header color
+        translucent={false}
+        backgroundColor={appColors.primaryColor}
+        barStyle="light-content" // white icons/text
       />
+
       <Provider store={store}>
         <NavigationContainer>
-          <View style={{ flex: 1 }}>
-            {/* 🔔 Show Notification Center at top */}
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: appColors.primaryColor,
+              paddingTop:
+                Platform.OS == "android" ? StatusBar.currentHeight : 0,
+              
+            }}
+          >
             {/* <NotificationCenter messages={messages} /> */}
+
             <Stack.Navigator
-              screenOptions={{ headerShown: false }}
+              screenOptions={{
+                headerShown: false,
+                contentStyle: {
+                  backgroundColor: "#fff",
+                },
+              }}
               initialRouteName={initialRoute}
             >
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ title: "Login" }}
-              />
-              <Stack.Screen
-                name="SignUp"
-                component={SignUp}
-                options={{ title: "SignUp" }}
-              />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="SignUp" component={SignUp} />
               <Stack.Screen name="BottomBar" component={BottomBar} />
+
               <Stack.Screen
                 name="UniversityInfo"
                 component={UniversityInfo}
-                options={{ title: "UniversityInfo" }}
                 initialParams={{ from: 1 }}
               />
               <Stack.Screen
                 name="StudentDetials"
                 component={StudentDetials}
-                options={{ title: "StudentDetials" }}
                 initialParams={{ from: 1 }}
               />
               <Stack.Screen
                 name="ParentDetials"
                 component={ParentDetials}
-                options={{ title: "ParentDetials" }}
                 initialParams={{ from: 1 }}
               />
               <Stack.Screen
                 name="StudentAddress"
                 component={StudentAddress}
-                options={{ title: "StudentAddress" }}
                 initialParams={{ from: 1 }}
               />
               <Stack.Screen
                 name="DocumentUpload"
                 component={DocumentUpload}
-                options={{ title: "DocumentUpload" }}
                 initialParams={{ from: 1 }}
               />
-              {/* <Stack.Screen
-                  name="ProfileScreen"
-                  component={ProfileScreen}
-                  options={{ title: "ProfileScreen" }}
-                /> */}
-              <Stack.Screen
-                name="ViewImage"
-                component={ViewImage}
-                options={{ title: "ViewImage" }}
-              />
-              <Stack.Screen
-                name="ProfileOptios"
-                component={ProfileOptios}
-                options={{ title: "ProfileOptios" }}
-              />
-              <Stack.Screen
-                name="ApplyTelex"
-                component={ApplyTelex}
-                options={{ title: "ApplyTelex" }}
-              />
-              <Stack.Screen
-                name="ResultScreen"
-                component={ResultScreen}
-                options={{ title: "ResultScreen" }}
-              />
-              <Stack.Screen
-                name="Attendance"
-                component={Attendance}
-                options={{ title: "Attendance" }}
-              />
-              <Stack.Screen
-                name="DigitalCard"
-                component={DigitalCard}
-                options={{ title: "DigitalCard" }}
-              />
+
+              <Stack.Screen name="ViewImage" component={ViewImage} />
+              <Stack.Screen name="ProfileOptios" component={ProfileOptios} />
+              <Stack.Screen name="ApplyTelex" component={ApplyTelex} />
+              <Stack.Screen name="ResultScreen" component={ResultScreen} />
+              <Stack.Screen name="Attendance" component={Attendance} />
+              <Stack.Screen name="DigitalCard" component={DigitalCard} />
               <Stack.Screen
                 name="IssueReportScreen"
                 component={IssueReportScreen}
-                options={{ title: "IssueReportScreen" }}
               />
               <Stack.Screen
                 name="IssueListScreen"
                 component={IssueListScreen}
-                options={{ title: "IssueListScreen" }}
               />
               <Stack.Screen
                 name="PdfRecreatedScreen"
                 component={PdfRecreatedScreen}
-                options={{ title: "PdfRecreatedScreen" }}
               />
-              <Stack.Screen
-                name="Achivements"
-                component={Achivements}
-                options={{ title: "Achivements" }}
-              />
-              <Stack.Screen
-                name="ForgotPassword"
-                component={ForgotPassword}
-                options={{ title: "ForgotPassword" }}
-              />
-              <Stack.Screen
-                name="ImageViewer"
-                component={ImageViewer}
-                options={{ title: "ImageViewer" }}
-              />
-              <Stack.Screen
-                name="AlumniDetails"
-                component={AlumniDetails}
-                options={{ title: "AlumniDetails" }}
-              />
+              <Stack.Screen name="Achivements" component={Achivements} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+              <Stack.Screen name="ImageViewer" component={ImageViewer} />
+              <Stack.Screen name="AlumniDetails" component={AlumniDetails} />
               <Stack.Screen
                 name="UploadAlumniDocuments"
                 component={UploadAlumniDocuments}
-                options={{ title: "UploadAlumniDocuments" }}
               />
               <Stack.Screen name="UserType" component={UserTypeScreen} />
               <Stack.Screen name="PartnerLogin" component={PartnerLogin} />
@@ -437,41 +403,89 @@ const App = () => {
               <Stack.Screen name="StudentDetails" component={StudentDetails} />
               <Stack.Screen name="OtpScreen" component={OtpScreen} />
 
-              {/* Admin Screens */}
+              {/* Admin */}
               <Stack.Screen name="AdminLogin" component={AdminLogin} />
-              <Stack.Screen name="AdminProfileOptions" component={AdminProfileOptions} />
+              <Stack.Screen
+                name="AdminProfileOptions"
+                component={AdminProfileOptions}
+              />
               <Stack.Screen name="AdminHome" component={AdminHome} />
               <Stack.Screen name="LogoutScreen" component={LogoutScreen} />
               <Stack.Screen name="AdminChat" component={AdminChat} />
               <Stack.Screen name="AdminAgents" component={AdminAgents} />
               <Stack.Screen name="AdminAddAgent" component={AdminAddAgent} />
-              <Stack.Screen name="AdminAgentDetails" component={AdminAgentDetails} />
+              <Stack.Screen
+                name="AdminAgentDetails"
+                component={AdminAgentDetails}
+              />
               <Stack.Screen name="AdminStudents" component={AdminStudents} />
-              <Stack.Screen name="AdminStudentDetails" component={AdminStudentDetails} />
-              <Stack.Screen name="AdminStudentResult" component={AdminStudentResult} />
-              <Stack.Screen name="AdminStudentAttendance" component={AdminStudentAttendance} />
-              <Stack.Screen name="AdminNewStudents" component={AdminNewStudents} />
-              <Stack.Screen name="AdminNewStudentDetails" component={AdminNewStudentDetails} />
-              <Stack.Screen name="AdminUniversities" component={AdminUniversities} />
-              <Stack.Screen name="AdminAddUniversity" component={AdminAddUniversity} />
-              <Stack.Screen name="AdminUniversityDetails" component={AdminUniversityDetails} />
+              <Stack.Screen
+                name="AdminStudentDetails"
+                component={AdminStudentDetails}
+              />
+              <Stack.Screen
+                name="AdminStudentResult"
+                component={AdminStudentResult}
+              />
+              <Stack.Screen
+                name="AdminStudentAttendance"
+                component={AdminStudentAttendance}
+              />
+              <Stack.Screen
+                name="AdminNewStudents"
+                component={AdminNewStudents}
+              />
+              <Stack.Screen
+                name="AdminNewStudentDetails"
+                component={AdminNewStudentDetails}
+              />
+              <Stack.Screen
+                name="AdminUniversities"
+                component={AdminUniversities}
+              />
+              <Stack.Screen
+                name="AdminAddUniversity"
+                component={AdminAddUniversity}
+              />
+              <Stack.Screen
+                name="AdminUniversityDetails"
+                component={AdminUniversityDetails}
+              />
               <Stack.Screen name="AdminCourses" component={AdminCourses} />
               <Stack.Screen name="AdminAddCourse" component={AdminAddCourse} />
-              <Stack.Screen name="AdminCourseDetails" component={AdminCourseDetails} />
+              <Stack.Screen
+                name="AdminCourseDetails"
+                component={AdminCourseDetails}
+              />
               <Stack.Screen name="AdminAlumni" component={AdminAlumni} />
-              <Stack.Screen name="AdminAnnouncements" component={AdminAnnouncements} />
-              <Stack.Screen name="AdminAddAnnouncement" component={AdminAddAnnouncement} />
-              <Stack.Screen name="AdminAnnouncementDetails" component={AdminAnnouncementDetails} />
+              <Stack.Screen
+                name="AdminAnnouncements"
+                component={AdminAnnouncements}
+              />
+              <Stack.Screen
+                name="AdminAddAnnouncement"
+                component={AdminAddAnnouncement}
+              />
+              <Stack.Screen
+                name="AdminAnnouncementDetails"
+                component={AdminAnnouncementDetails}
+              />
               <Stack.Screen name="AdminBanners" component={AdminBanners} />
               <Stack.Screen name="AdminAddBanner" component={AdminAddBanner} />
               <Stack.Screen name="AdminGallery" component={AdminGallery} />
-              <Stack.Screen name="AdminAddGallery" component={AdminAddGallery} />
+              <Stack.Screen
+                name="AdminAddGallery"
+                component={AdminAddGallery}
+              />
               <Stack.Screen name="AdminSettings" component={AdminSettings} />
-              <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-
+              <Stack.Screen
+                name="ChangePassword"
+                component={ChangePasswordScreen}
+              />
             </Stack.Navigator>
           </View>
         </NavigationContainer>
+
         <StylishAlert
           visible={alertVisible}
           title={alertData.title}
@@ -490,4 +504,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-

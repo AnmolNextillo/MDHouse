@@ -18,9 +18,13 @@ import { useDispatch, useSelector } from "react-redux";
 import ImagePicker from "react-native-image-crop-picker";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { appColors } from "../../../utils/color";
-import { hitAdminAddGallery, clearAdminAddGallery } from "../../../redux/admin_apis/AdminAddGallerySlice";
+import {
+  hitAdminAddGallery,
+  clearAdminAddGallery,
+} from "../../../redux/admin_apis/AdminAddGallerySlice";
 import { uploadFile, clearUploadFileData } from "../../../redux/uploadFile";
 import { requestAllPermissions } from "../../../utils/constants";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AdminAddGallery = ({ navigation }) => {
   const [title, setTitle] = useState("");
@@ -29,8 +33,12 @@ const AdminAddGallery = ({ navigation }) => {
   const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   const dispatch = useDispatch();
-  const { isLoading: isUploading } = useSelector((state) => state.uploadFileReducer);
-  const { isLoading: isAdding } = useSelector((state) => state.adminAddGalleryReducer);
+  const { isLoading: isUploading } = useSelector(
+    (state) => state.uploadFileReducer,
+  );
+  const { isLoading: isAdding } = useSelector(
+    (state) => state.adminAddGalleryReducer,
+  );
 
   const showPermissionDeniedAlert = () => {
     Alert.alert(
@@ -47,7 +55,7 @@ const AdminAddGallery = ({ navigation }) => {
             // You can add Linking.openSettings() here if needed
           },
         },
-      ]
+      ],
     );
   };
 
@@ -59,7 +67,7 @@ const AdminAddGallery = ({ navigation }) => {
       mediaType: "photo",
       freeStyleCropEnabled: true,
     })
-      .then(image => {
+      .then((image) => {
         console.log("📸 Camera Image:", image);
         const payload = {
           uri: image.path,
@@ -67,9 +75,9 @@ const AdminAddGallery = ({ navigation }) => {
           type: image.mime,
         };
         dispatch(uploadFile(payload));
-        setSelectedImages(prev => [...prev, image.path]);
+        setSelectedImages((prev) => [...prev, image.path]);
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.code === "E_NO_CAMERA_PERMISSION") {
           showPermissionDeniedAlert();
         }
@@ -87,9 +95,9 @@ const AdminAddGallery = ({ navigation }) => {
       multiple: true,
       maxFiles: 10,
     })
-      .then(images => {
+      .then((images) => {
         console.log("🖼️ Gallery Images:", images);
-        images.forEach(image => {
+        images.forEach((image) => {
           const payload = {
             uri: image.path,
             fileName: image.filename || `gallery_${Date.now()}.jpg`,
@@ -97,9 +105,12 @@ const AdminAddGallery = ({ navigation }) => {
           };
           dispatch(uploadFile(payload));
         });
-        setSelectedImages(prev => [...prev, ...images.map(img => img.path)]);
+        setSelectedImages((prev) => [
+          ...prev,
+          ...images.map((img) => img.path),
+        ]);
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.code === "E_NO_LIBRARY_PERMISSION") {
           showPermissionDeniedAlert();
         }
@@ -108,7 +119,7 @@ const AdminAddGallery = ({ navigation }) => {
   };
 
   const removeImage = (index) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -129,11 +140,13 @@ const AdminAddGallery = ({ navigation }) => {
       // Upload all images first
       const uploadedUrls = [];
       for (let i = 0; i < selectedImages.length; i++) {
-        const uploadResult = await dispatch(uploadFile({
-          uri: selectedImages[i],
-          fileName: `gallery_${Date.now()}_${i}.jpg`,
-          type: 'image/jpeg',
-        })).unwrap();
+        const uploadResult = await dispatch(
+          uploadFile({
+            uri: selectedImages[i],
+            fileName: `gallery_${Date.now()}_${i}.jpg`,
+            type: "image/jpeg",
+          }),
+        ).unwrap();
 
         console.log("Upload Result:", uploadResult);
 
@@ -147,7 +160,7 @@ const AdminAddGallery = ({ navigation }) => {
           imageUrl = uploadResult.data.url;
         } else if (uploadResult?.link) {
           imageUrl = uploadResult.link;
-        } else if (typeof uploadResult === 'string') {
+        } else if (typeof uploadResult === "string") {
           imageUrl = uploadResult;
         }
 
@@ -156,7 +169,7 @@ const AdminAddGallery = ({ navigation }) => {
         if (imageUrl) {
           uploadedUrls.push({
             type: "image",
-            link: imageUrl
+            link: imageUrl,
           });
         }
 
@@ -191,7 +204,10 @@ const AdminAddGallery = ({ navigation }) => {
           },
         ]);
       } else {
-        const apiError = resultAction.payload || resultAction.error?.message || "Something went wrong";
+        const apiError =
+          resultAction.payload ||
+          resultAction.error?.message ||
+          "Something went wrong";
         Alert.alert("Error", apiError);
         setIsUploadingImages(false);
       }
@@ -203,20 +219,20 @@ const AdminAddGallery = ({ navigation }) => {
   };
 
   const selectImageSource = () => {
-    Alert.alert(
-      "Select Image Source",
-      "Choose how to select gallery images",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Camera", onPress: openCamera },
-        { text: "Gallery (Multiple)", onPress: openGallery },
-      ]
-    );
+    Alert.alert("Select Image Source", "Choose how to select gallery images", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Camera", onPress: openCamera },
+      { text: "Gallery (Multiple)", onPress: openGallery },
+    ]);
   };
 
   const renderImageItem = ({ item, index }) => (
     <View style={styles.imageItem}>
-      <Image source={{ uri: item }} style={styles.selectedImage} resizeMode="cover" />
+      <Image
+        source={{ uri: item }}
+        style={styles.selectedImage}
+        resizeMode="cover"
+      />
       <TouchableOpacity
         style={styles.removeButton}
         onPress={() => removeImage(index)}
@@ -235,9 +251,11 @@ const AdminAddGallery = ({ navigation }) => {
         <Text style={styles.headerText}>Add Gallery Item</Text>
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         <ScrollView
           contentContainerStyle={styles.content}
@@ -258,7 +276,10 @@ const AdminAddGallery = ({ navigation }) => {
           <View style={styles.field}>
             <Text style={styles.label}>Images ({selectedImages.length})</Text>
             <TouchableOpacity
-              style={[styles.imagePicker, isUploadingImages && { opacity: 0.5 }]}
+              style={[
+                styles.imagePicker,
+                isUploadingImages && { opacity: 0.5 },
+              ]}
               onPress={selectImageSource}
               disabled={isUploadingImages}
             >
@@ -280,7 +301,9 @@ const AdminAddGallery = ({ navigation }) => {
           <TouchableOpacity
             style={[
               styles.submitButton,
-              (isUploading || isAdding || isUploadingImages) && { opacity: 0.7 },
+              (isUploading || isAdding || isUploadingImages) && {
+                opacity: 0.7,
+              },
             ]}
             onPress={handleSubmit}
             disabled={isUploading || isAdding || isUploadingImages}
@@ -292,7 +315,7 @@ const AdminAddGallery = ({ navigation }) => {
             )}
           </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
 
       {isUploadingImages && (
         <View style={styles.uploadOverlay}>
@@ -304,10 +327,7 @@ const AdminAddGallery = ({ navigation }) => {
             </Text>
             <View style={styles.progressBar}>
               <View
-                style={[
-                  styles.progressFill,
-                  { width: `${uploadProgress}%` },
-                ]}
+                style={[styles.progressFill, { width: `${uploadProgress}%` }]}
               />
             </View>
           </View>

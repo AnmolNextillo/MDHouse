@@ -28,6 +28,7 @@ import {
 } from "@invertase/react-native-apple-authentication";
 import { getImage } from "../../../utils/getImages";
 import BackIcon from "../../../assets/svgs/BackIcon";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AdminLogin = ({ navigation }) => {
   // const [email, setEmail] = useState("admin@themdhouse.com");
@@ -41,7 +42,7 @@ const AdminLogin = ({ navigation }) => {
   const responseLogin = useSelector((state) => state.loginReducer.data);
   const responseVersion = useSelector((state) => state.getVersionReducer.data);
   const responseGoogleLogin = useSelector(
-    (state) => state.googleLoginReducer.data
+    (state) => state.googleLoginReducer.data,
   );
   const dispatch = useDispatch();
 
@@ -62,13 +63,18 @@ const AdminLogin = ({ navigation }) => {
 
   // ✅ Login Click
   const onLoginClick = () => {
-
     if (!email) {
       Alert.alert("MD House", "Please enter Email.");
     } else if (!password) {
       Alert.alert("MD House", "Please enter Password.");
     } else {
-      const payload = { email, password, fcmToken, studentType: "admin", role: "Admin" };
+      const payload = {
+        email,
+        password,
+        fcmToken,
+        studentType: "admin",
+        role: "Admin",
+      };
       dispatch(hitLogin(payload));
     }
   };
@@ -80,19 +86,16 @@ const AdminLogin = ({ navigation }) => {
     // const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" : loginData.data.isProfileCompleted == 1 ? "BottomBar" : "AlumniDetails";
 
     navigation.reset({ index: 0, routes: [{ name: "BottomBar" }] });
-
-  }
+  };
 
   // ✅ Handle login response
   useEffect(() => {
     console.log("Login Response Partner:", responseLogin);
     if (responseLogin) {
-
       if (responseLogin.status === 1) {
         // navigation.navigate("OtpScreen", { id:responseLogin.data._id, userType:"partner" });
         saveToken(responseLogin);
-      }
-      else Alert.alert("MD House", responseLogin.message);
+      } else Alert.alert("MD House", responseLogin.message);
       dispatch(clearLoginData());
     }
   }, [responseLogin]);
@@ -124,7 +127,6 @@ const AdminLogin = ({ navigation }) => {
           : "https://apps.apple.com/in/app/mdhouse/id6749562016";
 
       if (currentVersion < latestVersion) {
-
         await AsyncStorage.removeItem("token");
         await AsyncStorage.removeItem("userType");
         await AsyncStorage.clear();
@@ -135,7 +137,7 @@ const AdminLogin = ({ navigation }) => {
         Alert.alert(
           "Update Available",
           `A new version (${latestVersion}) is available. Please update to continue.`,
-          [{ text: "Update Now", onPress: () => Linking.openURL(updateUrl) }]
+          [{ text: "Update Now", onPress: () => Linking.openURL(updateUrl) }],
         );
       }
     } catch (err) {
@@ -154,10 +156,11 @@ const AdminLogin = ({ navigation }) => {
             <BackIcon height={32} width={32} fill={appColors.white} />
           </TouchableOpacity>
         </View>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          extraScrollHeight={20}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
@@ -243,10 +246,9 @@ const AdminLogin = ({ navigation }) => {
               >
                 <Text style={styles.forgotText}>Forgot Password? </Text>
               </TouchableOpacity> */}
-
             </Animatable.View>
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </LinearGradient>
   );

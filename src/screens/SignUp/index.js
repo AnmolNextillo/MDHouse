@@ -27,6 +27,7 @@ import {
   appleAuth,
   AppleButton,
 } from "@invertase/react-native-apple-authentication";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const SignUp = ({ navigation, routes }) => {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ const SignUp = ({ navigation, routes }) => {
 
   const responseSignup = useSelector((state) => state.signupReducer.data);
   const responseGoogleLogin = useSelector(
-    (state) => state.googleLoginReducer.data
+    (state) => state.googleLoginReducer.data,
   );
 
   useEffect(() => {
@@ -79,11 +80,11 @@ const SignUp = ({ navigation, routes }) => {
   /* ---------------- Navigation Logic ---------------- */
   const saveToken = async (loginData) => {
     await AsyncStorage.setItem("token", loginData.token);
+    await AsyncStorage.setItem("step", JSON.stringify(loginData.data.step));
     await AsyncStorage.setItem(
-      "step",
-      JSON.stringify(loginData.data.step)
+      "user",
+      JSON.stringify(loginData.data.studentType),
     );
-    await AsyncStorage.setItem("user", JSON.stringify(loginData.data.studentType));
 
     const routesMap = {
       1: "UniversityInfo",
@@ -93,7 +94,12 @@ const SignUp = ({ navigation, routes }) => {
       5: "DocumentUpload",
     };
 
-    const screen = loginData.data.studentType == 1 ? routesMap[loginData.data.step] || "BottomBar" : loginData.data.isProfileCompleted == 1 ? "BottomBar" : "AlumniDetails";
+    const screen =
+      loginData.data.studentType == 1
+        ? routesMap[loginData.data.step] || "BottomBar"
+        : loginData.data.isProfileCompleted == 1
+        ? "BottomBar"
+        : "AlumniDetails";
 
     navigation.reset({
       index: 0,
@@ -125,7 +131,7 @@ const SignUp = ({ navigation, routes }) => {
   const onSignupClick = () => {
     if (!userType) {
       Alert.alert("MD House", "Please select Student or Alumni");
-      return
+      return;
     }
     if (!name) Alert.alert("MD House", "Please Enter Name");
     else if (!email) Alert.alert("MD House", "Please Enter Email");
@@ -138,7 +144,7 @@ const SignUp = ({ navigation, routes }) => {
           password,
           studentType: userType,
           fcmToken,
-        })
+        }),
       );
   };
 
@@ -189,7 +195,7 @@ const SignUp = ({ navigation, routes }) => {
           studentType: userType == "student" ? 1 : 2,
           type: "apple",
           fcmToken,
-        })
+        }),
       );
     } catch (e) {
       console.log("Apple error", e);
@@ -203,9 +209,11 @@ const SignUp = ({ navigation, routes }) => {
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          extraScrollHeight={20}
         >
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <Animatable.View animation="zoomIn" style={styles.logoContainer}>
@@ -272,14 +280,10 @@ const SignUp = ({ navigation, routes }) => {
                   style={styles.input}
                 />
                 <TouchableOpacity
-                  onPress={() =>
-                    setIsPasswordVisible(!isPasswordVisible)
-                  }
+                  onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                 >
                   <Image
-                    source={getImage(
-                      isPasswordVisible ? "show" : "hide"
-                    )}
+                    source={getImage(isPasswordVisible ? "show" : "hide")}
                     style={styles.eye}
                   />
                 </TouchableOpacity>
@@ -297,9 +301,7 @@ const SignUp = ({ navigation, routes }) => {
                 onPress={onGoogleButtonPress}
               >
                 <GoogleIcon />
-                <Text style={styles.googleText}>
-                  Sign up with Google
-                </Text>
+                <Text style={styles.googleText}>Sign up with Google</Text>
               </TouchableOpacity>
 
               {/* iOS Apple Button */}
@@ -319,7 +321,7 @@ const SignUp = ({ navigation, routes }) => {
               </TouchableOpacity>
             </Animatable.View>
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </LinearGradient>
   );

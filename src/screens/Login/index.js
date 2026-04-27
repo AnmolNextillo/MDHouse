@@ -10,7 +10,6 @@ import {
   SafeAreaView,
   Platform,
   Linking,
-  KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
@@ -31,6 +30,7 @@ import {
   AppleButton,
 } from "@invertase/react-native-apple-authentication";
 import BackIcon from "../../assets/svgs/BackIcon";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const Login = ({ navigation,routes }) => {
 
@@ -244,10 +244,11 @@ const Login = ({ navigation,routes }) => {
             <BackIcon height={32} width={32} fill={appColors.white} />
           </TouchableOpacity>
         </View>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          extraScrollHeight={20}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
@@ -390,7 +391,7 @@ const Login = ({ navigation,routes }) => {
               </TouchableOpacity>
             </Animatable.View>
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </LinearGradient>
   );

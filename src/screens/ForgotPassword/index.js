@@ -19,6 +19,7 @@ import {
   clearForgotPassword,
   hitForgotPassword,
 } from "../../redux/ForgotPasswordSlice";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -67,10 +68,11 @@ const ForgotPassword = ({ navigation }) => {
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          extraScrollHeight={20}
         >
           {/* Logo */}
           <Animatable.View
@@ -118,7 +120,7 @@ const ForgotPassword = ({ navigation }) => {
               <Text style={styles.backText}>Back to Login</Text>
             </TouchableOpacity>
           </Animatable.View>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </LinearGradient>
   );

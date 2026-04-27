@@ -15,14 +15,20 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { appColors } from "../../../utils/color";
-import { hitAdminAddAnnouncement, clearAdminAddAnnouncement } from "../../../redux/admin_apis/AdminAddAnnouncementSlice";
+import {
+  hitAdminAddAnnouncement,
+  clearAdminAddAnnouncement,
+} from "../../../redux/admin_apis/AdminAddAnnouncementSlice";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AdminAddAnnouncement = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const dispatch = useDispatch();
-  const { isLoading, data, error } = useSelector((state) => state.adminAddAnnouncementReducer);
+  const { isLoading, data, error } = useSelector(
+    (state) => state.adminAddAnnouncementReducer,
+  );
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -53,7 +59,10 @@ const AdminAddAnnouncement = ({ navigation }) => {
           },
         ]);
       } else {
-        const apiError = resultAction.payload || resultAction.error?.message || "Something went wrong";
+        const apiError =
+          resultAction.payload ||
+          resultAction.error?.message ||
+          "Something went wrong";
         Alert.alert("Error", apiError);
       }
     } catch (e) {
@@ -71,9 +80,11 @@ const AdminAddAnnouncement = ({ navigation }) => {
         <Text style={styles.headerText}>Add Announcement</Text>
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         <ScrollView
           contentContainerStyle={styles.content}
@@ -105,10 +116,7 @@ const AdminAddAnnouncement = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
-            style={[
-              styles.submitButton,
-              isLoading && { opacity: 0.7 },
-            ]}
+            style={[styles.submitButton, isLoading && { opacity: 0.7 }]}
             onPress={handleSubmit}
             disabled={isLoading}
           >
@@ -119,7 +127,7 @@ const AdminAddAnnouncement = ({ navigation }) => {
             )}
           </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

@@ -22,6 +22,7 @@ import LogoutScreen from "../screens/Admin/LogoutScreen/index.js";
 import AdminHome from "../screens/Admin/AdminHome/index.js";
 import AdminChat from "../screens/Admin/AdminChat/index.js";
 import AdminNotifications from "../screens/Admin/AdminNotifications/index.js";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // import HomeIcon from '../assets/svg/HomeIcon';
 // import TasksIcon from '../assets/svg/TasksIcon';
@@ -33,7 +34,7 @@ import AdminNotifications from "../screens/Admin/AdminNotifications/index.js";
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
-
+ const insets = useSafeAreaInsets();
   const responseDashboard = useSelector((state) => state.dashboardReducer.data);
   const responseCheckUser = useSelector((state) => state.checkUserReducer.data);
   const dispatch = useDispatch();
@@ -90,7 +91,8 @@ const Tabs = () => {
           position: "absolute",
           elevation: 0,
           backgroundColor: appColors.white,
-          height: 60,
+          height: 65 + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
         },
         tabBarLabelStyle: {
           fontSize: 14, // ✅ Bigger text

@@ -22,16 +22,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CountryCodeModal from "../../../components/CountryCodeModal";
 import countries from "../../../assets/countries.json";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const StudentAddress = ({ navigation, route }) => {
   const { from } = route.params;
   const dispatch = useDispatch();
 
   const responseProfileData = useSelector(
-    (state) => state.getProfileReducer.data
+    (state) => state.getProfileReducer.data,
   );
   const responseUpdateProfile = useSelector(
-    (state) => state.updateProfileReducer.data
+    (state) => state.updateProfileReducer.data,
   );
 
   /* ================= STATES ================= */
@@ -77,7 +78,7 @@ const StudentAddress = ({ navigation, route }) => {
 
     await AsyncStorage.setItem(
       "step",
-      from === 1 ? JSON.stringify(5) : JSON.stringify(6)
+      from === 1 ? JSON.stringify(5) : JSON.stringify(6),
     );
 
     const payload = {
@@ -163,13 +164,7 @@ const StudentAddress = ({ navigation, route }) => {
 
   /* ================= PHONE INPUT UI ================= */
 
-  const renderPhoneInput = (
-    label,
-    number,
-    setNumber,
-    code,
-    modalKey
-  ) => (
+  const renderPhoneInput = (label, number, setNumber, code, modalKey) => (
     <>
       <Text style={styles.labelStyle}>{label}</Text>
       <View style={styles.phoneWrapper}>
@@ -207,12 +202,13 @@ const StudentAddress = ({ navigation, route }) => {
         <Text style={styles.headerText}>Student Address</Text>
       </View>
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         <ScrollView showsVerticalScrollIndicator={false}>
-          
           {/* INDIA ADDRESS */}
           <Text style={styles.sectionTitle}>Address (India)</Text>
 
@@ -265,7 +261,7 @@ const StudentAddress = ({ navigation, route }) => {
             phoneNumberF,
             setPhoneNumberF,
             phoneCountryCodeF,
-            "studyMobile"
+            "studyMobile",
           )}
 
           {renderPhoneInput(
@@ -273,7 +269,7 @@ const StudentAddress = ({ navigation, route }) => {
             phoneNumberW,
             setPhoneNumberW,
             phoneCountryCodeW,
-            "studyWhatsapp"
+            "studyWhatsapp",
           )}
 
           {/* FOREIGN ADDRESS */}
@@ -327,7 +323,7 @@ const StudentAddress = ({ navigation, route }) => {
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
 
       <CountryCodeModal
         modalVisible={modalVisibleCountry}

@@ -27,6 +27,7 @@ import { clearUploadFileData, uploadFile } from "../../redux/uploadFile";
 import AttachmentIcon from "../../assets/svgs/AttachmentIcon";
 import DocumentPickerModal from "../../components/DocumentPickerModal";
 import { useIsFocused } from "@react-navigation/native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const Chat = ({ navigation }) => {
   const [messages, setMessages] = useState(null);
@@ -39,10 +40,10 @@ const Chat = ({ navigation }) => {
 
   const responseChat = useSelector((state) => state.getChatReducer.data);
   const responseSendMessage = useSelector(
-    (state) => state.setMessageReducer.data
+    (state) => state.setMessageReducer.data,
   );
   const responseUploadImage = useSelector(
-    (state) => state.uploadFileReducer.data
+    (state) => state.uploadFileReducer.data,
   );
 
   /* ================= CHAT AUTO REFRESH ================= */
@@ -115,7 +116,7 @@ const Chat = ({ navigation }) => {
     } else {
       Alert.alert(
         "Permission Denied",
-        "Please allow permissions from settings."
+        "Please allow permissions from settings.",
       );
     }
   };
@@ -129,7 +130,7 @@ const Chat = ({ navigation }) => {
             uri: image.path,
             fileName: image.filename || "image.jpg",
             type: image.mime,
-          })
+          }),
         );
       })
       .catch(() => {});
@@ -144,7 +145,7 @@ const Chat = ({ navigation }) => {
             uri: image.path,
             fileName: image.filename || "image.jpg",
             type: image.mime,
-          })
+          }),
         );
       })
       .catch(() => {});
@@ -159,7 +160,7 @@ const Chat = ({ navigation }) => {
           uri: results[0].uri,
           fileName: results[0].name,
           type: results[0].type,
-        })
+        }),
       );
     } catch {}
   };
@@ -176,8 +177,7 @@ const Chat = ({ navigation }) => {
   const getFileExtension = (url) =>
     url?.split(".").pop()?.split(/\#|\?/)[0] || "";
 
-  const getFileName = (url) =>
-    url?.split("/").pop()?.split(/\#|\?/)[0] || "";
+  const getFileName = (url) => url?.split("/").pop()?.split(/\#|\?/)[0] || "";
 
   const renderContent = (item) => {
     const isMe = item.senderType == 1;
@@ -238,10 +238,11 @@ const Chat = ({ navigation }) => {
       </View>
 
       {/* KEYBOARD SAFE AREA */}
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={20}
       >
         {/* CHAT LIST */}
         {!isProgress ? (
@@ -325,7 +326,7 @@ const Chat = ({ navigation }) => {
           onGallery={openGallery}
           onDocument={openDocument}
         />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };

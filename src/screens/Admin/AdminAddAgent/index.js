@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BackIcon from "../../../assets/svgs/BackIcon";
 import { appColors } from "../../../utils/color";
 import { hitAdminAddAgent, clearAdminAddAgent } from "../../../redux/admin_apis/AdminAddAgentSlice";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AdminAddAgent = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -86,10 +87,12 @@ const AdminAddAgent = ({ navigation }) => {
         <Text style={styles.headerText}>Add Agent</Text>
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+      <KeyboardAwareScrollView
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+                enableOnAndroid={true}
+                extraScrollHeight={20}
+              >
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -205,7 +208,7 @@ const AdminAddAgent = ({ navigation }) => {
             )}
           </TouchableOpacity>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

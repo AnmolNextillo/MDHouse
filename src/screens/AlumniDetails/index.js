@@ -30,7 +30,7 @@ const AlumniDetails = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
   console.log("AlumniDetails Screen Rendered with params:", route.params);
-  const {from} = route.params || {};
+  const { from } = route.params || {};
   const scrollViewRef = useRef(null);
   const countriesCode = getCountries();
   const [modalVisible, setModalVisible] = useState(false);
@@ -66,7 +66,9 @@ const AlumniDetails = ({ navigation, route }) => {
   const responseUpdateProfile = useSelector(
     (state) => state.updateProfileReducer.data,
   );
-  const { isSendingSingle } = useSelector((state) => state.getNotificationsReducer);
+  const { isSendingSingle } = useSelector(
+    (state) => state.getNotificationsReducer,
+  );
 
   /* ================= PROFILE DATA ================= */
 
@@ -84,8 +86,7 @@ const AlumniDetails = ({ navigation, route }) => {
       setWhatsapp(data.whatsAppMobileNumber || "");
       setWorkingAt(data.workingAt || "");
 
-      if (data.countryCode)
-        setMobileCallingCode(data.countryCode);
+      if (data.countryCode) setMobileCallingCode(data.countryCode);
       if (data.whatsappCountryCode)
         setWhatsappCallingCode(data.whatsappCountryCode);
     }
@@ -174,10 +175,16 @@ const AlumniDetails = ({ navigation, route }) => {
   };
 
   const handleSendNotification = async () => {
-    const studentId = responseProfileData?.data?._id || responseProfileData?.data?.studentId || route.params?.studentId;
+    const studentId =
+      responseProfileData?.data?._id ||
+      responseProfileData?.data?.studentId ||
+      route.params?.studentId;
 
     if (!studentId) {
-      Alert.alert("Notification", "Student ID is not available to send notification.");
+      Alert.alert(
+        "Notification",
+        "Student ID is not available to send notification.",
+      );
       return;
     }
     if (!notificationTitle.trim() || !notificationDescription.trim()) {
@@ -198,7 +205,10 @@ const AlumniDetails = ({ navigation, route }) => {
       setNotificationDescription("");
       setShowNotificationForm(false);
     } else {
-      const errorMessage = resultAction.payload?.message || resultAction.error?.message || "Unable to send notification.";
+      const errorMessage =
+        resultAction.payload?.message ||
+        resultAction.error?.message ||
+        "Unable to send notification.";
       Alert.alert("Error", errorMessage);
     }
   };
@@ -211,12 +221,14 @@ const AlumniDetails = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      {from == 2&&<View style={styles.headerStyle}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackIcon height={32} width={32} fill={appColors.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Alumni Details</Text>
-      </View>}
+      {from == 2 && (
+        <View style={styles.headerStyle}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon height={32} width={32} fill={appColors.white} />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Alumni Details</Text>
+        </View>
+      )}
 
       <KeyboardAwareScrollView
         ref={scrollViewRef}
@@ -362,23 +374,29 @@ const AlumniDetails = ({ navigation, route }) => {
                 placeholderTextColor="#999"
               />
               <TextInput
-                style={[styles.notificationInput, { height: 100, textAlignVertical: 'top' }]}
+                style={[
+                  styles.notificationInput,
+                  { height: 100, textAlignVertical: "top" },
+                ]}
                 value={notificationDescription}
                 onChangeText={setNotificationDescription}
                 placeholder="Description"
                 placeholderTextColor="#999"
                 multiline
               />
+
               <View style={styles.notificationActionRow}>
-                <TouchableOpacity
-                  style={[styles.sendButton, { flex: 1, marginRight: 8 }]}
-                  onPress={handleSendNotification}
-                  disabled={isSendingSingle}
-                >
-                  <Text style={styles.sendButtonText}>
-                    {isSendingSingle ? "Sending..." : "Send Notification"}
-                  </Text>
-                </TouchableOpacity>
+                {from == 2 && (
+                  <TouchableOpacity
+                    style={[styles.sendButton, { flex: 1, marginRight: 8 }]}
+                    onPress={handleSendNotification}
+                    disabled={isSendingSingle}
+                  >
+                    <Text style={styles.sendButtonText}>
+                      {isSendingSingle ? "Sending..." : "Send Notification"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity
                   style={styles.cancelButton}
                   onPress={() => setShowNotificationForm(false)}
@@ -387,7 +405,7 @@ const AlumniDetails = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
             </View>
-          ) : (
+          ) : from ==2 && (
             <TouchableOpacity
               style={[styles.sendButton, { marginTop: 16 }]}
               onPress={() => setShowNotificationForm(true)}
